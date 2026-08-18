@@ -1,4 +1,4 @@
-import AuthGuard from "../components/AuthGuard";
+import AuthGuard from "../../components/AuthGuard";
 
 export const metadata = { title: "Campaigns" };
 
