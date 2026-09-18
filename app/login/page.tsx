@@ -31,29 +31,38 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const rawUsers = localStorage.getItem("adplatform_users");
-      const users: StoredUser[] = rawUsers ? JSON.parse(rawUsers) : [];
-      const user = users.find(
-        (entry) => entry.email.toLowerCase() === email.trim().toLowerCase() && entry.password === password
-      );
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+      });
 
-      if (!user) {
-        alert("No account matches these credentials. Please sign up first.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Invalid email or password");
         setIsLoading(false);
         return;
       }
 
+      const user = data.user;
       localStorage.setItem("mock_session", user.email);
       localStorage.setItem("mock_user", JSON.stringify(user));
       localStorage.setItem("mock_onboarding", user.onboardingComplete ? "true" : "false");
+      if (user.role === "admin") {
+        localStorage.setItem("mock_admin", "true");
+      }
 
       if (user.onboardingComplete) {
         router.push("/dashboard");
       } else {
         router.push("/onboarding/business-profile");
       }
-    } catch {
-      alert("Unable to sign in right now. Please try again.");
+    } catch (err: any) {
+      alert("Unable to sign in right now. Please check your network and try again.");
     } finally {
       setIsLoading(false);
     }

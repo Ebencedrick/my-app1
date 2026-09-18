@@ -18,10 +18,14 @@ export default function AppNav() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
     localStorage.removeItem("mock_session");
     localStorage.removeItem("mock_user");
     localStorage.removeItem("mock_onboarding");
+    localStorage.removeItem("mock_admin");
     router.push("/login");
   };
 

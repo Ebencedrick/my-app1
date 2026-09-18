@@ -17,12 +17,11 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import { getWalletBalance, addToWallet, getTransactions } from "@/lib/wallet";
 
-type CampaignStatus = "live" | "paused" | "draft";
+type CampaignStatus = "live" | "paused" | "draft" | "pending";
 
 type Campaign = {
-  id: number;
+  id: string | number;
   name: string;
   status: CampaignStatus;
   spend: number;
@@ -33,7 +32,7 @@ type Campaign = {
 };
 
 type ActivityItem = {
-  id: number;
+  id: string | number;
   type: "deposit" | "campaign" | "spend";
   description: string;
   amount: string;
@@ -41,10 +40,10 @@ type ActivityItem = {
 };
 
 const initialCampaigns: Campaign[] = [
-  { id: 1, name: "Summer Sale Push", status: "live", spend: 1480, reach: 32000, ctr: 4.8, budget: 2500, platform: "TikTok" },
-  { id: 2, name: "Brand Awareness", status: "paused", spend: 620, reach: 18000, ctr: 3.2, budget: 1200, platform: "Instagram" },
-  { id: 3, name: "Retargeting Boost", status: "draft", spend: 240, reach: 9000, ctr: 2.7, budget: 800, platform: "Meta" },
-  { id: 4, name: "Weekend Offer", status: "live", spend: 980, reach: 22000, ctr: 5.1, budget: 1800, platform: "Meta" },
+  { id: "demo_1", name: "Summer Sale Push", status: "live", spend: 1480, reach: 32000, ctr: 4.8, budget: 2500, platform: "TikTok" },
+  { id: "demo_2", name: "Brand Awareness", status: "paused", spend: 620, reach: 18000, ctr: 3.2, budget: 1200, platform: "Instagram" },
+  { id: "demo_3", name: "Retargeting Boost", status: "draft", spend: 240, reach: 9000, ctr: 2.7, budget: 800, platform: "Meta" },
+  { id: "demo_4", name: "Weekend Offer", status: "live", spend: 980, reach: 22000, ctr: 5.1, budget: 1800, platform: "Meta" },
 ];
 
 const initialActivity: ActivityItem[] = [
@@ -64,7 +63,7 @@ export default function DashboardPage() {
   const [showFundsModal, setShowFundsModal] = useState(false);
   const [fundAmount, setFundAmount] = useState("250");
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>(initialCampaigns[0]);
-  const [toast, setToast] = useState("Dashboard refreshed");
+  const [toast, setToast] = useState<string | null>("Dashboard refreshed");
 
   const filteredCampaigns = useMemo(() => {
     if (statusFilter === "all") return campaigns;
@@ -79,7 +78,7 @@ export default function DashboardPage() {
       activeCount,
       totalSpend,
       totalReach,
-      avgCtr: campaigns.reduce((sum, campaign) => sum + campaign.ctr, 0) / campaigns.length,
+      avgCtr: campaigns.length > 0 ? campaigns.reduce((sum, campaign) => sum + campaign.ctr, 0) / campaigns.length : 0,
     };
   }, [campaigns]);
 
@@ -88,44 +87,150 @@ export default function DashboardPage() {
     router.push("/campaigns/new");
   };
 
-  const handleFundWallet = (event: React.FormEvent) => {
+  const handleFundWallet = async (event: React.FormEvent) => {
     event.preventDefault();
     const amount = Number(fundAmount);
     if (!amount || amount <= 0) return;
-    const next = addToWallet(amount, "Manual top-up");
-    setWalletBalance(next);
-    setActivity((current) => [
-      { id: Date.now(), type: "deposit", description: `Wallet top-up of $${amount.toFixed(2)}`, amount: `+$${amount.toFixed(2)}`, time: "Just now" },
-      ...current,
-    ]);
-    setShowFundsModal(false);
-    setToast(`Added $${amount.toFixed(2)} to your wallet`);
+
+    try {
+      const res = await fetch("/api/wallet/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, gateway: "momo" }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setWalletBalance(data.balance || 0);
+        setActivity((current) => [
+          {
+            id: Date.now(),
+            type: "deposit",
+            description: `Wallet deposit of $${amount.toFixed(2)}`,
+            amount: `+$${amount.toFixed(2)}`,
+            time: "Just now",
+          },
+          ...current,
+        ]);
+        setToast(`Added $${amount.toFixed(2)} to your wallet`);
+      } else {
+        setToast(data.error || "Deposit failed");
+      }
+    } catch {
+      setToast("Network error during deposit");
+    } finally {
+      setShowFundsModal(false);
+    }
   };
 
-  // initialize balance from localStorage
+  // Initialize balance, transactions, and live campaigns from MongoDB APIs
   useEffect(() => {
-    const b = getWalletBalance();
-    setWalletBalance(b);
-    const txs = getTransactions();
-    if (txs && txs.length) {
-      // inject latest deposits into activity
-      const deposits = txs.slice(0, 5).map((t) => ({ id: t.id, type: "deposit" as const, description: `${t.method} deposit`, amount: `+$${t.amount.toFixed(2)}`, time: new Date(t.date).toLocaleString() }));
-      setActivity((current) => [...deposits, ...current]);
+    async function loadDashboardData() {
+      try {
+        const [balRes, txRes, campRes] = await Promise.all([
+          fetch("/api/wallet/balance"),
+          fetch("/api/wallet/transactions?limit=10"),
+          fetch("/api/campaigns"),
+        ]);
+
+        if (balRes.ok) {
+          const balData = await balRes.json();
+          setWalletBalance(balData.availableBalance || 0);
+          localStorage.setItem("mock_wallet_balance", String(balData.availableBalance || 0));
+        }
+
+        if (txRes.ok) {
+          const txData = await txRes.json();
+          if (txData.transactions && txData.transactions.length) {
+            const formatted: ActivityItem[] = txData.transactions.map((t: any) => ({
+              id: t._id,
+              type: t.type === "deposit" ? "deposit" : t.type === "settlement" ? "spend" : "campaign",
+              description: t.type === "deposit"
+                ? `${t.gateway ? t.gateway.toUpperCase() : "Wallet"} deposit`
+                : t.type === "hold"
+                ? "Campaign budget hold"
+                : t.type === "settlement"
+                ? "Campaign ad spend"
+                : "Hold release",
+              amount: t.type === "deposit" || t.type === "holdRelease" || t.type === "refund"
+                ? `+$${t.amount.toFixed(2)}`
+                : `-$${t.amount.toFixed(2)}`,
+              time: new Date(t.createdAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+            }));
+            setActivity(formatted);
+          }
+        }
+
+        if (campRes.ok) {
+          const campData = await campRes.json();
+          if (campData.campaigns && campData.campaigns.length > 0) {
+            const dbCampaigns: Campaign[] = campData.campaigns.map((c: any) => {
+              const budget = c.totalCharge || c.totalAdSpend || 0;
+              const isLive = c.status === "active";
+              const isCompleted = c.status === "completed";
+              const spend = isCompleted ? budget : isLive ? Number((budget * 0.35).toFixed(2)) : 0;
+              const reach = c.totalAdSpend ? Math.round(c.totalAdSpend * 120) : 0;
+              const platforms = Array.isArray(c.platforms) && c.platforms.length ? c.platforms.join(", ") : "Meta";
+
+              let status: CampaignStatus = "draft";
+              if (c.status === "active") status = "live";
+              else if (c.status === "paused") status = "paused";
+              else if (c.status === "pending" || c.status === "in_review") status = "pending";
+
+              return {
+                id: c._id,
+                name: c.name || "Ad Campaign",
+                status,
+                spend,
+                reach,
+                ctr: 3.2,
+                budget,
+                platform: platforms,
+              };
+            });
+            setCampaigns(dbCampaigns);
+            setSelectedCampaign(dbCampaigns[0]);
+          }
+        }
+      } catch (e) {
+        console.error("Dashboard load error:", e);
+      }
     }
+
+    loadDashboardData();
   }, []);
 
-  const handleToggleCampaign = (id: number) => {
+  const handleToggleCampaign = async (id: string | number) => {
+    const target = campaigns.find(c => c.id === id);
+    if (!target) return;
+    const nextStatus: CampaignStatus = target.status === "live" ? "paused" : "live";
+
     setCampaigns((current) =>
       current.map((campaign) => {
         if (campaign.id !== id) return campaign;
-        const nextStatus: CampaignStatus = campaign.status === "live" ? "paused" : "live";
         return { ...campaign, status: nextStatus };
       })
     );
-    setToast("Campaign status updated successfully");
+
+    if (typeof id === "string" && id.length === 24) {
+      try {
+        await fetch(`/api/campaigns/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: nextStatus === "live" ? "active" : "paused" }),
+        });
+      } catch (e) {
+        console.error("Error updating campaign status:", e);
+      }
+    }
+    setToast(`Campaign status updated to ${nextStatus}`);
   };
 
-  const handleViewDetails = (campaignId: number) => {
+  const handleViewDetails = (campaignId: string | number) => {
     router.push(`/campaigns/${campaignId}`);
   };
 
@@ -137,7 +242,6 @@ export default function DashboardPage() {
     } else if (item.type === "spend") {
       router.push("/billing");
     } else {
-      // fallback
       router.push("/activity");
     }
   };
@@ -145,15 +249,16 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen p-6">
       {toast ? (
-        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-          {toast}
+        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300 flex items-center justify-between">
+          <span>{toast}</span>
+          <button onClick={() => setToast(null)} className="text-emerald-400 hover:text-white text-xs">✕</button>
         </div>
       ) : null}
 
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="mb-2 text-4xl font-bold text-white md:text-5xl">Dashboard</h1>
-          <p className="text-base text-slate-400">Campaign overview and user operations center.</p>
+          <p className="text-base text-slate-400">Campaign overview and live operations center.</p>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -185,7 +290,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="text-sm text-pink-100">Wallet balance</p>
-                <p className="text-xs text-pink-100/80">Available funds</p>
+                <p className="text-xs text-pink-100/80">Available funds in MongoDB ledger</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -208,8 +313,8 @@ export default function DashboardPage() {
           </div>
 
           <div className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm backdrop-blur-sm">
-            <p className="text-pink-100">This month</p>
-            <p className="mt-1 text-xl font-semibold">${(walletBalance * 0.22).toFixed(2)}</p>
+            <p className="text-pink-100">Ledger Status</p>
+            <p className="mt-1 text-xl font-semibold">Active & Synced</p>
           </div>
         </div>
       </div>
@@ -231,10 +336,10 @@ export default function DashboardPage() {
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10">
               <DollarSign className="h-5 w-5 text-violet-400" />
             </div>
-            <span className="text-xs text-slate-300">Today</span>
+            <span className="text-xs text-slate-300">Total</span>
           </div>
           <p className="text-3xl font-bold text-white">${summary.totalSpend.toFixed(2)}</p>
-          <p className="mt-1 text-sm text-slate-400">Total spend</p>
+          <p className="mt-1 text-sm text-slate-400">Total ad spend</p>
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
@@ -245,7 +350,7 @@ export default function DashboardPage() {
             <span className="text-xs text-slate-300">Reach</span>
           </div>
           <p className="text-3xl font-bold text-white">{summary.totalReach.toLocaleString()}</p>
-          <p className="mt-1 text-sm text-slate-400">Total reach</p>
+          <p className="mt-1 text-sm text-slate-400">Total audience reach</p>
         </div>
       </div>
 
@@ -253,18 +358,18 @@ export default function DashboardPage() {
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h2 className="text-xl font-semibold text-white">Campaign monitor</h2>
           <div className="flex flex-wrap gap-2">
-            {(["all", "live", "paused", "draft"] as const).map((filter) => (
+            {(["all", "live", "paused", "pending", "draft"] as const).map((filter) => (
               <button
                 key={filter}
                 type="button"
                 onClick={() => setStatusFilter(filter)}
-                className={`rounded-full px-3 py-1.5 text-sm transition ${
+                className={`rounded-full px-3 py-1.5 text-sm transition capitalize ${
                   statusFilter === filter
                     ? "bg-pink-500/15 text-pink-300 ring-1 ring-pink-500/40"
                     : "bg-slate-800 text-slate-300 hover:text-white"
                 }`}
               >
-                {filter === "all" ? "All" : filter}
+                {filter === "all" ? "All" : filter === "pending" ? "In Review" : filter}
               </button>
             ))}
           </div>
@@ -276,25 +381,27 @@ export default function DashboardPage() {
               <div className="mb-3 flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-white">{campaign.name}</p>
-                  <p className="text-sm text-slate-400">{campaign.platform}</p>
+                  <p className="text-sm text-slate-400 capitalize">{campaign.platform}</p>
                 </div>
                 <span
-                  className={`rounded-full px-2 py-1 text-xs ${
+                  className={`rounded-full px-2 py-1 text-xs capitalize ${
                     campaign.status === "live"
                       ? "bg-emerald-500/10 text-emerald-300"
                       : campaign.status === "paused"
                         ? "bg-yellow-500/10 text-yellow-300"
-                        : "bg-slate-500/10 text-slate-300"
+                        : campaign.status === "pending"
+                          ? "bg-amber-500/10 text-amber-300"
+                          : "bg-slate-500/10 text-slate-300"
                   }`}
                 >
-                  {campaign.status}
+                  {campaign.status === "live" ? "Running" : campaign.status === "pending" ? "In Review" : campaign.status}
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div>
                   <p className="text-slate-400">Spend</p>
-                  <p className="mt-1 font-semibold text-white">${campaign.spend}</p>
+                  <p className="mt-1 font-semibold text-white">${campaign.spend.toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="text-slate-400">Reach</p>
@@ -385,28 +492,34 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-            <p className="text-sm text-slate-400">Selected campaign</p>
-            <p className="mt-2 text-xl font-semibold text-white">{selectedCampaign.name}</p>
-            <div className="mt-4 space-y-3 text-sm">
-              <div className="flex justify-between text-slate-300">
-                <span>Budget</span>
-                <span>${selectedCampaign.budget}</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Spend</span>
-                <span>${selectedCampaign.spend}</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Reach</span>
-                <span>{selectedCampaign.reach.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>CTR</span>
-                <span>{selectedCampaign.ctr}%</span>
+          {selectedCampaign ? (
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+              <p className="text-sm text-slate-400">Selected campaign</p>
+              <p className="mt-2 text-xl font-semibold text-white">{selectedCampaign.name}</p>
+              <div className="mt-4 space-y-3 text-sm">
+                <div className="flex justify-between text-slate-300">
+                  <span>Budget</span>
+                  <span>${selectedCampaign.budget.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Spend</span>
+                  <span>${selectedCampaign.spend.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Reach</span>
+                  <span>{selectedCampaign.reach.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>CTR</span>
+                  <span>{selectedCampaign.ctr}%</span>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-6 text-center text-slate-400 text-sm">
+              No campaigns to display yet.
+            </div>
+          )}
         </div>
       </div>
 

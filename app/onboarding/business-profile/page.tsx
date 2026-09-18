@@ -49,21 +49,26 @@ export default function BusinessProfilePage() {
       // persist locally as before
       localStorage.setItem("mock_user", JSON.stringify(nextUser));
 
-      // send onboarding profile to server to create user and seed wallet (dev mode)
-      if (nextUser?.email) {
-        try {
-          await fetch('/api/onboarding/profile', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ email: nextUser.email, name: nextUser.businessName || nextUser.email, initialTopUp: 20 }),
-          });
-        } catch (e) {
-          // non-fatal; continue with local flow
-          console.warn('onboarding API failed', e);
-        }
+      const res = await fetch('/api/onboarding/profile', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          businessName: formData.businessName,
+          industry: formData.industry,
+          website: formData.website,
+          campaignGoal: formData.campaignGoal,
+          audience: formData.audience,
+          budget: formData.budget,
+          platformFocus: formData.platformFocus,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (data.user) {
+        localStorage.setItem("mock_user", JSON.stringify(data.user));
       }
 
-      router.push("/onboarding/verify");
+      router.push("/onboarding/plan");
     } catch (err) {
       console.error(err);
       alert("Your business profile could not be saved. Please try again.");
@@ -105,11 +110,11 @@ export default function BusinessProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-pink-950 flex items-center justify-center px-4 py-4">
       <div className="max-w-3xl w-full">
         <div className="mb-4">
-          <p className="text-pink-300 text-xs uppercase tracking-[0.2em] font-medium">Step 1 of 3</p>
+          <p className="text-pink-300 text-xs uppercase tracking-[0.2em] font-medium">Step 1 of 2</p>
           <h1 className="text-2xl md:text-3xl font-bold text-white mt-2">Tell us about your business</h1>
           <p className="text-slate-400 mt-1 text-sm">This helps us understand your market and build a smarter campaign strategy for you.</p>
           <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3">
-            <div className="bg-gradient-to-r from-pink-500 to-orange-500 h-1.5 rounded-full" style={{ width: "33%" }}></div>
+            <div className="bg-gradient-to-r from-pink-500 to-orange-500 h-1.5 rounded-full" style={{ width: "50%" }}></div>
           </div>
         </div>
 

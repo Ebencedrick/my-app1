@@ -13,10 +13,14 @@ export default function DesktopPanel() {
   const [userName, setUserName] = useState<string | null>(null);
   const [balance, setBalance] = useState<number>(0);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
     localStorage.removeItem("mock_session");
     localStorage.removeItem("mock_user");
     localStorage.removeItem("mock_onboarding");
+    localStorage.removeItem("mock_admin");
     router.push("/login");
   };
 
@@ -45,6 +49,15 @@ export default function DesktopPanel() {
     } catch (e) {
       setBalance(0);
     }
+
+    fetch("/api/wallet/balance")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && typeof data.availableBalance === "number") {
+          setBalance(data.availableBalance);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   return (

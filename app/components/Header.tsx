@@ -49,11 +49,15 @@ export default function Header() {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
     try {
       localStorage.removeItem("mock_session");
       localStorage.removeItem("mock_user");
       localStorage.removeItem("mock_onboarding");
+      localStorage.removeItem("mock_admin");
     } catch (e) {
       // ignore
     }

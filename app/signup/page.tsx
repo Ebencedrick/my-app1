@@ -48,33 +48,31 @@ export default function SignupPage() {
     }
 
     try {
-      const rawUsers = localStorage.getItem("adplatform_users");
-      const users: StoredUser[] = rawUsers ? JSON.parse(rawUsers) : [];
-      const alreadyExists = users.some(
-        (user) => user.email.toLowerCase() === formData.email.trim().toLowerCase()
-      );
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password,
+          phone: formData.phone.trim(),
+        }),
+      });
 
-      if (alreadyExists) {
-        alert("An account with this email already exists. Please sign in instead.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Unable to create your account right now.");
         setIsLoading(false);
         return;
       }
 
-      const newUser: StoredUser = {
-        email: formData.email.trim(),
-        password: formData.password,
-        phone: formData.phone.trim(),
-        onboardingComplete: false,
-      };
-
-      users.push(newUser);
-      localStorage.setItem("adplatform_users", JSON.stringify(users));
-      localStorage.setItem("mock_session", newUser.email);
-      localStorage.setItem("mock_user", JSON.stringify(newUser));
+      // Store fast client cache for UI components while cookies manage session
+      localStorage.setItem("mock_session", data.user.email);
+      localStorage.setItem("mock_user", JSON.stringify(data.user));
       localStorage.setItem("mock_onboarding", "false");
       router.push("/onboarding/business-profile");
-    } catch {
-      alert("Unable to create your account right now. Please try again.");
+    } catch (err: any) {
+      alert("Network error. Unable to reach server.");
     } finally {
       setIsLoading(false);
     }

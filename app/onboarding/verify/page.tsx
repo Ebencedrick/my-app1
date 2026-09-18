@@ -33,24 +33,32 @@ export default function VerifyPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const storedUser = localStorage.getItem("mock_user");
-    const user = storedUser ? JSON.parse(storedUser) : null;
+    try {
+      const res = await fetch('/api/onboarding/verify', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ phone, kycDocumentName: documentFile?.name }),
+      });
 
-    if (user) {
-      user.phoneVerified = true;
-      localStorage.setItem("mock_user", JSON.stringify(user));
+      const data = await res.json().catch(() => ({}));
+      if (data.user) {
+        localStorage.setItem("mock_user", JSON.stringify(data.user));
+      } else {
+        const storedUser = localStorage.getItem("mock_user");
+        const user = storedUser ? JSON.parse(storedUser) : null;
+        if (user) {
+          user.phoneVerified = true;
+          localStorage.setItem("mock_user", JSON.stringify(user));
+        }
+      }
 
-      const users = JSON.parse(localStorage.getItem("adplatform_users") || "[]");
-      const updatedUsers = users.map((entry: { email: string }) =>
-        entry.email === user.email ? { ...entry, ...user } : entry
-      );
-      localStorage.setItem("adplatform_users", JSON.stringify(updatedUsers));
+      router.push("/onboarding/plan");
+    } catch (err) {
+      console.error("Verification error:", err);
+      router.push("/onboarding/plan");
+    } finally {
+      setIsLoading(false);
     }
-
-    setTimeout(() => {
-      localStorage.setItem("mock_onboarding", "true");
-      router.push("/dashboard");
-    }, 400);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,6 +172,13 @@ export default function VerifyPage() {
               className="flex-1 py-2.5 border border-slate-700 text-slate-200 rounded-lg font-semibold hover:bg-slate-700 transition-colors text-sm"
             >
               Back
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/onboarding/plan")}
+              className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-pink-400 border border-pink-500/30 rounded-lg font-semibold transition-colors text-sm"
+            >
+              Skip for now →
             </button>
           </div>
         </div>
