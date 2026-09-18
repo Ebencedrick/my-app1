@@ -24,3 +24,34 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Compact dashboard adjustments */
+.dashboard-compact {
+  font-size: 0.9rem; /* slightly smaller base */
+}
+.dashboard-compact h1 {
+  font-size: 1.25rem; /* reduce large headings */
+}
+.dashboard-compact h2 {
+  font-size: 1.05rem;
+}
+.dashboard-compact h3 {
+  font-size: 0.98rem;
+}
+.dashboard-compact .rounded-2xl.p-6 {
+  padding: 0.75rem !important; /* reduce card padding */
+}
+.dashboard-compact .p-6 {
+  padding: 0.75rem !important;
+}
+.dashboard-compact .px-6 {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+.dashboard-compact .py-3 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+.dashboard-compact .text-3xl {
+  font-size: 1.25rem !important;
+}

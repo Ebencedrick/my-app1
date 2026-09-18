@@ -24,6 +24,8 @@ import {
   ChevronDown as ChevronDownIcon
 } from "lucide-react";
 
+import TikTokIcon from "@/components/ui/TikTokIcon";
+
 type WizardStep = "upload" | "preview" | "targeting" | "review";
 
 const steps: WizardStep[] = ["upload", "preview", "targeting", "review"];
@@ -64,27 +66,56 @@ export default function CampaignWizardPage() {
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSubmittingCampaign, setIsSubmittingCampaign] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
   const countries = [
-    "Cameroon", "Nigeria", "Ghana", "Kenya", "South Africa", "Egypt", 
-    "Morocco", "Tanzania", "Uganda", "Ethiopia", "Ivory Coast", "Senegal",
-    "Mali", "Burkina Faso", "Niger", "Chad", "Sudan", "DR Congo",
-    "Zambia", "Zimbabwe", "Mozambique", "Angola", "Botswana", "Namibia",
-    "Malawi", "Rwanda", "Burundi", "Somalia", "Liberia", "Sierra Leone",
-    "Guinea", "Benin", "Togo", "Gabon", "Congo", "Central African Republic"
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+    "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
+    "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+    "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica",
+    "Croatia", "Cuba", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica",
+    "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
+    "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
+    "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland",
+    "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
+    "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar",
+    "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia",
+    "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands",
+    "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau",
+    "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
+    "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino",
+    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
+    "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan",
+    "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
+    "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates",
+    "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen",
+    "Zambia", "Zimbabwe"
   ];
+
+  const filteredCountries = countrySearch.trim()
+    ? countries.filter((country) => country.toLowerCase().includes(countrySearch.toLowerCase().trim()))
+    : countries;
 
   const toggleCountry = (country: string) => {
     setSelectedCountries(prev => {
-      const newSelection = prev.includes(country) 
+      const newSelection = prev.includes(country)
         ? prev.filter(c => c !== country)
         : [...prev, country];
-      
-      setFormData({ ...formData, targeting: { ...formData.targeting, location: newSelection.join(", ") } });
+
+      setFormData({
+        ...formData,
+        targeting: {
+          ...formData.targeting,
+          location: newSelection.join(", "),
+        },
+      });
+
       return newSelection;
     });
   };
@@ -404,7 +435,7 @@ export default function CampaignWizardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl">
                   <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-lg flex items-center justify-center">
                       <Target className="w-5 h-5 text-pink-400" />
                     </div>
                     <div className="flex-1">
@@ -453,7 +484,7 @@ export default function CampaignWizardPage() {
 
                 <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl">
                   <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center">
                       <TrendingUp className="w-5 h-5 text-purple-400" />
                     </div>
                     <div className="flex-1">
@@ -495,27 +526,43 @@ export default function CampaignWizardPage() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg flex items-center justify-center">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-900/50 rounded-xl gap-3">
+                  <div className="flex items-start sm:items-center gap-3 flex-1">
+                    <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg flex items-center justify-center">
                       <Facebook className="w-5 h-5 text-blue-400" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className="text-slate-400 text-sm">Platforms</p>
-                      <div className="flex gap-2 mt-1">
-                        {(["facebook", "instagram", "tiktok"] as const).map((platform) => (
-                          <button
-                            key={platform}
-                            onClick={() => togglePlatform(platform)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                              formData.autoGenerated.platforms[platform]
-                                ? "bg-pink-500/20 text-pink-400 border border-pink-500/30"
-                                : "bg-slate-800 text-slate-400 border border-slate-700"
-                            }`}
-                          >
-                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                          </button>
-                        ))}
+                      <div className="mt-2">
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(formData.autoGenerated.platforms).map(([platform, enabled]) => {
+                            if (!enabled) return null;
+                            return (
+                              <div key={platform} className="flex items-center gap-2 bg-slate-900/40 px-2 py-1 rounded-lg text-xs">
+                                {platform === "facebook" && <Facebook className="w-4 h-4 text-blue-400" />}
+                                {platform === "instagram" && <Instagram className="w-4 h-4 text-pink-400" />}
+                                {platform === "tiktok" && <TikTokIcon className="w-4 h-4 text-white" />}
+                                <span className="text-xs text-slate-300">{platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {(["facebook", "instagram", "tiktok"] as const).map((platform) => (
+                            <button
+                              key={platform}
+                              onClick={() => togglePlatform(platform)}
+                              className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${
+                                formData.autoGenerated.platforms[platform]
+                                  ? "bg-pink-500/20 text-pink-400 border border-pink-500/30"
+                                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                              }`}
+                            >
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -538,7 +585,7 @@ export default function CampaignWizardPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-purple-400" />
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">Fine-Tune Your Targeting</h2>
+              <h2 className="text-2xl md:text-5xl font-bold text-white mb-2">Fine-Tune Your Targeting</h2>
               <p className="text-base text-slate-400">Customize who sees your ads and how much to spend</p>
             </div>
 
@@ -551,49 +598,67 @@ export default function CampaignWizardPage() {
                 <div className="relative">
                   <button
                     type="button"
-                    onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                    onClick={() => {
+                      setIsCountryDropdownOpen(!isCountryDropdownOpen);
+                      if (!isCountryDropdownOpen) setCountrySearch("");
+                    }}
                     className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white text-left transition-all duration-300 flex items-center justify-between"
                   >
                     <span className="text-slate-500">
-                      {selectedCountries.length > 0 
-                        ? `${selectedCountries.length} country${selectedCountries.length > 1 ? 'ies' : ''} selected` 
+                      {selectedCountries.length > 0
+                        ? `${selectedCountries.length} country${selectedCountries.length > 1 ? 'ies' : ''} selected`
                         : "Select countries"}
                     </span>
                     <ChevronDownIcon className={`w-4 h-4 text-slate-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
-                  
+
                   {isCountryDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
-                      <div className="p-2">
-                        {countries.map((country) => (
-                          <button
-                            key={country}
-                            type="button"
-                            onClick={() => toggleCountry(country)}
-                            className="w-full px-4 py-2 rounded-lg text-left transition-all duration-200 flex items-center gap-3 hover:bg-slate-700"
-                          >
-                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                              selectedCountries.includes(country) 
-                                ? 'border-pink-500 bg-pink-500/20' 
-                                : 'border-slate-600'
-                            }`}>
-                              {selectedCountries.includes(country) && (
-                                <CheckCircle className="w-3 h-3 text-pink-400" />
-                              )}
-                            </div>
-                            <span className={`text-sm ${
-                              selectedCountries.includes(country) ? 'text-white font-medium' : 'text-slate-400'
-                            }`}>
-                              {country}
-                            </span>
-                          </button>
-                        ))}
+                    <div className="absolute z-20 w-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl">
+                      <div className="p-3 border-b border-slate-700">
+                        <input
+                          type="text"
+                          value={countrySearch}
+                          onChange={(e) => setCountrySearch(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                          placeholder="Search country..."
+                          autoFocus
+                        />
+                      </div>
+
+                      <div className="max-h-72 overflow-y-auto p-2">
+                        {filteredCountries.length > 0 ? (
+                          filteredCountries.map((country) => {
+                            const isSelected = selectedCountries.includes(country);
+
+                            return (
+                              <button
+                                key={country}
+                                type="button"
+                                onClick={() => toggleCountry(country)}
+                                className="w-full px-4 py-2.5 rounded-lg text-left transition-all duration-200 flex items-center gap-3 hover:bg-slate-700"
+                              >
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                  isSelected ? 'border-pink-500 bg-pink-500/20' : 'border-slate-600'
+                                }`}>
+                                  {isSelected && <CheckCircle className="w-3 h-3 text-pink-400" />}
+                                </div>
+                                <span className={`text-sm ${isSelected ? 'text-white font-medium' : 'text-slate-400'}`}>
+                                  {country}
+                                </span>
+                              </button>
+                            );
+                          })
+                        ) : (
+                          <div className="px-4 py-6 text-center text-sm text-slate-400">
+                            No countries match your search.
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
                 </div>
                 {selectedCountries.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     {selectedCountries.map((country) => (
                       <span
                         key={country}
@@ -618,7 +683,7 @@ export default function CampaignWizardPage() {
                   <Users className="w-4 h-4 text-pink-400" />
                   Age Range
                 </label>
-                <div className="flex gap-4 items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
                   <input
                     type="number"
                     min="18"
@@ -628,7 +693,7 @@ export default function CampaignWizardPage() {
                       ...formData, 
                       targeting: { ...formData.targeting, ageRange: { ...formData.targeting.ageRange, min: parseInt(e.target.value) } }
                     })}
-                    className="w-24 px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white transition-all duration-300"
+                    className="w-full sm:w-28 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white transition-all duration-300"
                   />
                   <span className="text-slate-400">to</span>
                   <input
@@ -640,7 +705,7 @@ export default function CampaignWizardPage() {
                       ...formData, 
                       targeting: { ...formData.targeting, ageRange: { ...formData.targeting.ageRange, max: parseInt(e.target.value) } }
                     })}
-                    className="w-24 px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white transition-all duration-300"
+                    className="w-full sm:w-28 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white transition-all duration-300"
                   />
                 </div>
               </div>
@@ -650,12 +715,12 @@ export default function CampaignWizardPage() {
                   <Users className="w-4 h-4 text-pink-400" />
                   Gender
                 </label>
-                <div className="flex gap-4">
+                <div className="flex gap-2 flex-wrap">
                   {["all", "male", "female"].map((gender) => (
                     <button
                       key={gender}
                       onClick={() => setFormData({ ...formData, targeting: { ...formData.targeting, gender: gender as any } })}
-                      className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 capitalize ${
+                      className={`px-3 py-2 rounded-md border-2 text-sm transition-all duration-300 capitalize ${
                         formData.targeting.gender === gender
                           ? "border-pink-500 bg-pink-500/10 text-pink-400"
                           : "border-slate-700 text-slate-400 hover:border-slate-600"
@@ -667,7 +732,7 @@ export default function CampaignWizardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-pink-400" />
@@ -706,8 +771,8 @@ export default function CampaignWizardPage() {
                     <span>${(formData.targeting.dailyBudget * formData.targeting.days).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-300">
-                    <span>Management Fee (15%)</span>
-                    <span>${((formData.targeting.dailyBudget * formData.targeting.days) * 0.15).toFixed(2)}</span>
+                    <span>Platform Fee (5%)</span>
+                    <span>${((formData.targeting.dailyBudget * formData.targeting.days) * 0.05).toFixed(2)}</span>
                   </div>
                   <div className="border-t border-slate-600 pt-2 mt-2">
                     <div className="flex justify-between text-lg font-bold text-white">
@@ -791,7 +856,7 @@ export default function CampaignWizardPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8 pb-24 sm:pb-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Create Campaign</h1>
@@ -818,7 +883,8 @@ export default function CampaignWizardPage() {
           )}
         </div>
 
-        <div className="flex justify-between">
+        {/* Fixed action bar for mobile to keep controls visible */}
+        <div className="hidden md:flex justify-between">
           <button
             onClick={prevStep}
             className="px-6 py-3 border-2 border-slate-700 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-all duration-300 flex items-center gap-2"
@@ -850,16 +916,173 @@ export default function CampaignWizardPage() {
             </button>
           ) : (
             <button
-              onClick={() => {
-                alert("Campaign created successfully!");
-                router.push("/campaigns");
+              onClick={async () => {
+                setIsSubmittingCampaign(true);
+                setSubmitError(null);
+                try {
+                  const userRaw = typeof window !== 'undefined' ? localStorage.getItem('mock_user') : null;
+                  const userObj = userRaw ? JSON.parse(userRaw) : null;
+                  const userEmail = userObj?.email || userObj?.email_address || userObj?.name || null;
+                  const total = calculateTotalCost();
+
+                  if (!userEmail) {
+                    setSubmitError('User not signed in (mock_user missing)');
+                    setIsSubmittingCampaign(false);
+                    return;
+                  }
+
+                  // attempt debit
+                  const txRes = await fetch('/api/wallet/transaction', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ type: 'debit', amount: total, user: userEmail }),
+                  });
+
+                  const txJson = await txRes.json();
+                  if (!txRes.ok) {
+                    setSubmitError(txJson?.error || 'Failed to debit wallet');
+                    setIsSubmittingCampaign(false);
+                    return;
+                  }
+
+                  // create campaign
+                  const payload = {
+                    name: formData.autoGenerated.copyText ? formData.autoGenerated.copyText.slice(0, 60) : 'New Campaign',
+                    objective: formData.objective,
+                    platforms: Object.entries(formData.autoGenerated.platforms).filter(([_, v]) => v).map(([k]) => k),
+                    targeting: formData.targeting,
+                    budget: total,
+                    status: 'pending',
+                  };
+
+                  const createRes = await fetch('/api/campaigns', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json', 'x-mock-user': userEmail },
+                    body: JSON.stringify(payload),
+                  });
+
+                  const createJson = await createRes.json();
+                  if (!createRes.ok) {
+                    // refund on failure
+                    await fetch('/api/wallet/transaction', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type: 'credit', amount: total, user: userEmail }) });
+                    setSubmitError(createJson?.error || 'Failed to create campaign');
+                    setIsSubmittingCampaign(false);
+                    return;
+                  }
+
+                  router.push('/campaigns');
+                } catch (e: any) {
+                  setSubmitError(String(e));
+                } finally {
+                  setIsSubmittingCampaign(false);
+                }
               }}
-              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-pink-500/25 hover:scale-105"
+              disabled={isSubmittingCampaign}
+              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-pink-500/25 hover:scale-105 disabled:opacity-60"
             >
               <Flame className="w-4 h-4" />
-              Launch Campaign
+              {isSubmittingCampaign ? 'Launching...' : 'Launch Campaign'}
             </button>
           )}
+        </div>
+
+        {/* Mobile fixed action bar */}
+        <div className="fixed bottom-4 left-4 right-4 md:hidden z-50">
+          <div className="bg-slate-900/95 border border-slate-800 rounded-3xl shadow-2xl p-3 flex justify-between items-center">
+            <button
+              onClick={prevStep}
+              className="px-4 py-2 border-2 border-slate-700 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-all duration-300 flex items-center gap-2"
+            >
+              {stepIndex === 0 ? (
+                <>
+                  <X className="w-4 h-4" />
+                </>
+              ) : (
+                <span className="text-sm">Back</span>
+              )}
+            </button>
+
+            {stepIndex < steps.length - 1 ? (
+              <button
+                onClick={nextStep}
+                disabled={isGenerating}
+                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-pink-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isGenerating ? (
+                  "Generating..."
+                ) : (
+                  <>
+                    <span className="text-sm">{currentStep === "upload" ? "Generate" : "Continue"}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  setIsSubmittingCampaign(true);
+                  setSubmitError(null);
+                  try {
+                    const userRaw = typeof window !== 'undefined' ? localStorage.getItem('mock_user') : null;
+                    const userObj = userRaw ? JSON.parse(userRaw) : null;
+                    const userEmail = userObj?.email || userObj?.email_address || userObj?.name || null;
+                    const total = calculateTotalCost();
+
+                    if (!userEmail) {
+                      setSubmitError('User not signed in (mock_user missing)');
+                      setIsSubmittingCampaign(false);
+                      return;
+                    }
+
+                    const txRes = await fetch('/api/wallet/transaction', {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      body: JSON.stringify({ type: 'debit', amount: total, user: userEmail }),
+                    });
+                    const txJson = await txRes.json();
+                    if (!txRes.ok) {
+                      setSubmitError(txJson?.error || 'Failed to debit wallet');
+                      setIsSubmittingCampaign(false);
+                      return;
+                    }
+
+                    const payload = {
+                      name: formData.autoGenerated.copyText ? formData.autoGenerated.copyText.slice(0, 60) : 'New Campaign',
+                      objective: formData.objective,
+                      platforms: Object.entries(formData.autoGenerated.platforms).filter(([_, v]) => v).map(([k]) => k),
+                      targeting: formData.targeting,
+                      budget: total,
+                      status: 'pending',
+                    };
+
+                    const createRes = await fetch('/api/campaigns', {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json', 'x-mock-user': userEmail },
+                      body: JSON.stringify(payload),
+                    });
+                    const createJson = await createRes.json();
+                    if (!createRes.ok) {
+                      await fetch('/api/wallet/transaction', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type: 'credit', amount: total, user: userEmail }) });
+                      setSubmitError(createJson?.error || 'Failed to create campaign');
+                      setIsSubmittingCampaign(false);
+                      return;
+                    }
+
+                    router.push('/campaigns');
+                  } catch (e: any) {
+                    setSubmitError(String(e));
+                  } finally {
+                    setIsSubmittingCampaign(false);
+                  }
+                }}
+                disabled={isSubmittingCampaign}
+                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-pink-500/25 disabled:opacity-60"
+              >
+                <Flame className="w-4 h-4" />
+                <span className="text-sm">{isSubmittingCampaign ? 'Launching...' : 'Launch'}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

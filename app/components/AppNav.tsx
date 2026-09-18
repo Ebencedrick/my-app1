@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { 
-  BarChart3, 
-  Wallet, 
-  Megaphone, 
-  FileText, 
-  Settings, 
-  LogOut, 
-  Flame 
+import {
+  BarChart3,
+  Wallet,
+  Megaphone,
+  FileText,
+  Settings,
+  LogOut,
+  Flame,
 } from "lucide-react";
+import DesktopPanel from "./DesktopPanel";
 
 export default function AppNav() {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function AppNav() {
 
   const handleLogout = () => {
     localStorage.removeItem("mock_session");
+    localStorage.removeItem("mock_user");
     localStorage.removeItem("mock_onboarding");
     router.push("/login");
   };
@@ -32,49 +34,29 @@ export default function AppNav() {
   ];
 
   return (
-    <aside className="w-64 h-screen bg-gradient-to-b from-slate-900 to-slate-950 border-r border-slate-800 flex flex-col fixed left-0 top-0">
-      <div className="p-6 border-b border-slate-800">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-orange-500 rounded-lg flex items-center justify-center shadow-lg shadow-pink-500/25">
-            <Flame className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-bold text-white">AdPlatform</span>
-        </Link>
-      </div>
+    <>
+      <DesktopPanel />
 
-      <nav className="flex-1 p-4 overflow-y-auto">
-        <ul className="space-y-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-pink-500/20 to-orange-500/20 text-pink-400 font-medium border border-pink-500/30"
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
-                  }`}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-pink-400' : ''}`} />
-                  {item.label}
+      {/* Mobile bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden pointer-events-none">
+        <div className="max-w-md mx-auto px-4 py-3 pointer-events-auto">
+          <div className="bg-slate-900/95 border border-slate-800 rounded-3xl shadow-2xl flex justify-between items-center px-3 py-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+              return (
+                <Link key={item.href} href={item.href} className="flex-1">
+                  <div className={`flex flex-col items-center justify-center py-1 ${isActive ? 'text-pink-400' : 'text-slate-400'}`}>
+                      <Icon className="w-6 h-6" />
+                      <span className="text-[11px] mt-1 block truncate text-center">{item.label}</span>
+                    </div>
                 </Link>
-              </li>
-            );
-          })}
-        </ul>
+              );
+            })}
+          </div>
+        </div>
       </nav>
-
-      <div className="p-4 border-t border-slate-800">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:bg-slate-800/50 hover:text-white rounded-lg transition-all duration-300"
-        >
-          <LogOut className="w-5 h-5" />
-          Logout
-        </button>
-      </div>
-    </aside>
+    </>
   );
 }
+

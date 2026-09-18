@@ -2,13 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Facebook, Instagram, PlayCircle, Plus, Eye, Pause, Play, MoreHorizontal, Edit, Trash2, Copy, X } from "lucide-react";
-
-const TikTokIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-  </svg>
-);
+import { Facebook, Instagram, Plus, Eye, Pause, Play, MoreHorizontal, Edit, Trash2, Copy, X } from "lucide-react";
+import TikTokIcon from "@/components/ui/TikTokIcon";
 
 export default function CampaignsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -155,23 +150,23 @@ export default function CampaignsPage() {
 
   return (
     <div className="p-6 min-h-screen">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Campaigns</h1>
-          <p className="text-base text-slate-400">Manage and monitor your ad campaigns</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Campaigns</h1>
+          <p className="text-sm sm:text-base text-slate-400">Manage and monitor your ad campaigns</p>
         </div>
         <Link
           href="/campaigns/new"
-          className="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-pink-500/25 hover:scale-105 flex items-center gap-2 text-sm"
+          className="px-4 py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-pink-500/25 hover:scale-105 flex items-center gap-2 text-sm"
         >
           <Plus className="w-4 h-4" />
-          Create Campaign
+          <span className="hidden xs:block">Create Campaign</span>
         </Link>
       </div>
 
       {/* Filters */}
       <div className="bg-slate-800/50 border border-slate-700 p-4 rounded-2xl mb-6">
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <label className="block text-xs font-medium text-slate-300 mb-1">
               Status
@@ -302,7 +297,7 @@ export default function CampaignsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-700">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-700">
                 <div>
                   <p className="text-xs text-slate-400 mb-1">Budget / Spend</p>
                   <p className="text-sm font-semibold text-white">${campaign.spend.toFixed(2)} / ${campaign.budget.toFixed(2)}</p>

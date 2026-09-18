@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function VerifyPage() {
@@ -11,56 +11,74 @@ export default function VerifyPage() {
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("mock_user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user.phone) setPhone(user.phone);
+    }
+  }, []);
+
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock send verification code - replace with actual SMS API
     setTimeout(() => {
       setIsCodeSent(true);
       setIsLoading(false);
-    }, 1000);
+    }, 800);
   };
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock verification - replace with actual API call
+    const storedUser = localStorage.getItem("mock_user");
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    if (user) {
+      user.phoneVerified = true;
+      localStorage.setItem("mock_user", JSON.stringify(user));
+
+      const users = JSON.parse(localStorage.getItem("adplatform_users") || "[]");
+      const updatedUsers = users.map((entry: { email: string }) =>
+        entry.email === user.email ? { ...entry, ...user } : entry
+      );
+      localStorage.setItem("adplatform_users", JSON.stringify(updatedUsers));
+    }
+
     setTimeout(() => {
-      router.push("/onboarding/plan");
-    }, 500);
+      localStorage.setItem("mock_onboarding", "true");
+      router.push("/dashboard");
+    }, 400);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setDocumentFile(e.target.files[0]);
-    }
+    if (e.target.files && e.target.files[0]) setDocumentFile(e.target.files[0]);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-pink-950 flex items-center justify-center px-4 py-4">
       <div className="max-w-2xl w-full">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Verify your account</h1>
-          <p className="text-gray-600 dark:text-gray-400">Step 2 of 3</p>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-4">
-            <div className="bg-indigo-600 h-2 rounded-full" style={{ width: "66%" }}></div>
+        <div className="mb-4">
+          <p className="text-pink-300 text-xs uppercase tracking-[0.2em] font-medium">Step 2 of 3</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mt-2">Verify your account</h1>
+          <p className="text-slate-400 mt-1 text-sm">Secure your business profile and confirm your contact details before launching.</p>
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3">
+            <div className="bg-gradient-to-r from-pink-500 to-orange-500 h-1.5 rounded-full" style={{ width: "66%" }}></div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Phone Verification</h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              We'll send a verification code to your phone number via SMS
-            </p>
+        <div className="bg-slate-800/60 border border-slate-700 p-5 rounded-2xl shadow-2xl backdrop-blur-xl">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-white mb-1">Phone Verification</h2>
+            <p className="text-slate-400 text-sm">We will send a verification code to confirm your mobile number.</p>
           </div>
 
           {!isCodeSent ? (
-            <form onSubmit={handleSendCode} className="space-y-6">
+            <form onSubmit={handleSendCode} className="space-y-4">
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="phone" className="block text-xs font-medium text-slate-200 mb-1.5">
                   Phone Number *
                 </label>
                 <input
@@ -69,7 +87,7 @@ export default function VerifyPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2.5 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-slate-900 text-white placeholder-slate-500 text-sm"
                   placeholder="+237 6XX XXX XXX"
                 />
               </div>
@@ -77,15 +95,15 @@ export default function VerifyPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg font-semibold hover:from-pink-400 hover:to-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 {isLoading ? "Sending..." : "Send Verification Code"}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleVerifyCode} className="space-y-6">
+            <form onSubmit={handleVerifyCode} className="space-y-4">
               <div>
-                <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="verificationCode" className="block text-xs font-medium text-slate-200 mb-1.5">
                   Enter Verification Code *
                 </label>
                 <input
@@ -95,18 +113,16 @@ export default function VerifyPage() {
                   onChange={(e) => setVerificationCode(e.target.value)}
                   required
                   maxLength={6}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-center text-2xl tracking-widest"
+                  className="w-full px-3 py-2.5 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-slate-900 text-white text-center text-xl tracking-[0.4em]"
                   placeholder="000000"
                 />
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  Code sent to {phone}
-                </p>
+                <p className="text-sm text-slate-400 mt-1">Code sent to {phone}</p>
               </div>
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg font-semibold hover:from-pink-400 hover:to-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 {isLoading ? "Verifying..." : "Verify & Continue"}
               </button>
@@ -114,51 +130,38 @@ export default function VerifyPage() {
               <button
                 type="button"
                 onClick={() => setIsCodeSent(false)}
-                className="w-full py-2 text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="w-full py-2 text-pink-400 hover:text-pink-300 transition-colors text-sm"
               >
                 Change phone number
               </button>
             </form>
           )}
 
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Optional: Business Document
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-              Upload a business registration Document for higher spend limits (optional)
-            </p>
-            
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-              <input
-                type="file"
-                id="document"
-                onChange={handleFileChange}
-                accept=".pdf,.jpg,.jpeg,.png"
-                className="hidden"
-              />
-              <label
-                htmlFor="document"
-                className="cursor-pointer"
-              >
-                <div className="text-4xl mb-2">📄</div>
+          <div className="border-t border-slate-700 mt-5 pt-4">
+            <h3 className="text-base font-semibold text-white mb-2">Optional: Business document</h3>
+            <p className="text-slate-400 text-xs mb-3">Upload a registration document for higher account limits and accelerated approvals.</p>
+
+            <div className="border-2 border-dashed border-slate-600 rounded-xl p-4 text-center">
+              <input type="file" id="document" onChange={handleFileChange} accept=".pdf,.jpg,.jpeg,.png" className="hidden" />
+              <label htmlFor="document" className="cursor-pointer">
+                <div className="text-3xl mb-1">📄</div>
                 {documentFile ? (
-                  <p className="text-gray-900 dark:text-white font-medium">{documentFile.name}</p>
+                  <p className="text-white font-medium text-sm">{documentFile.name}</p>
                 ) : (
                   <>
-                    <p className="text-gray-700 dark:text-gray-300 font-medium">Click to upload</p>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">PDF, JPG, PNG up to 5MB</p>
+                    <p className="text-slate-200 font-medium text-sm">Click to upload</p>
+                    <p className="text-slate-400 text-xs">PDF, JPG, or PNG up to 5MB</p>
                   </>
                 )}
               </label>
             </div>
           </div>
 
-          <div className="flex gap-4 mt-8">
+          <div className="flex gap-3 mt-5">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 py-2.5 border border-slate-700 text-slate-200 rounded-lg font-semibold hover:bg-slate-700 transition-colors text-sm"
             >
               Back
             </button>
@@ -168,3 +171,4 @@ export default function VerifyPage() {
     </div>
   );
 }
+

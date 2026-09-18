@@ -1,9 +1,14 @@
-"use client"
+"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type Guard = "PUBLIC" | "ONBOARDING" | "APP" | "ADMIN";
+
+type StoredUser = {
+  email: string;
+  onboardingComplete?: boolean;
+};
 
 export default function AuthGuard({
   guard,
@@ -15,10 +20,13 @@ export default function AuthGuard({
   const router = useRouter();
 
   useEffect(() => {
-    // Mock session flags for scaffolding/demo purposes.
-    // Replace with NextAuth/session calls in real implementation.
     const session = typeof window !== "undefined" ? localStorage.getItem("mock_session") : null;
-    const onboardingComplete = typeof window !== "undefined" ? localStorage.getItem("mock_onboarding") === "true" : false;
+    const storedUser = typeof window !== "undefined" ? localStorage.getItem("mock_user") : null;
+    const parsedUser = storedUser ? (JSON.parse(storedUser) as StoredUser | null) : null;
+    const onboardingComplete =
+      typeof window !== "undefined"
+        ? parsedUser?.onboardingComplete || localStorage.getItem("mock_onboarding") === "true"
+        : false;
     const isAdmin = typeof window !== "undefined" ? localStorage.getItem("mock_admin") === "true" : false;
 
     if (guard === "PUBLIC" && session) {
@@ -56,3 +64,4 @@ export default function AuthGuard({
 
   return <>{children}</>;
 }
+

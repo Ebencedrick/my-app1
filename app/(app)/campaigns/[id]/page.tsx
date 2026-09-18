@@ -10,7 +10,6 @@ import {
   TrendingUp, 
   Facebook, 
   Instagram, 
-  PlayCircle, 
   Target, 
   MapPin, 
   Users, 
@@ -23,18 +22,17 @@ import {
   BarChart3,
   CheckCircle
 } from "lucide-react";
+import TikTokIcon from "@/components/ui/TikTokIcon";
 
 export default function CampaignDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id || "unknown";
   const [showStopModal, setShowStopModal] = useState(false);
-
-  // Mock data - replace with actual API calls
-  const campaign = {
+  const [campaign, setCampaign] = useState({
     id: id,
     name: "Summer Sale 2024",
-    status: "active",
+    status: "active" as "active" | "paused" | "completed",
     objective: "traffic_engagement" as "awareness" | "traffic_engagement",
     platforms: ["facebook", "instagram"],
     dailyBudget: 50.00,
@@ -76,7 +74,7 @@ export default function CampaignDetailPage() {
       { date: "2024-01-15", impressions: 4800, clicks: 132, spend: 34.60 },
       { date: "2024-01-16", impressions: 5100, clicks: 140, spend: 36.80 },
     ],
-  };
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -92,7 +90,7 @@ export default function CampaignDetailPage() {
     switch (platform) {
       case "facebook": return <Facebook className="w-5 h-5 text-blue-400" />;
       case "instagram": return <Instagram className="w-5 h-5 text-pink-400" />;
-      case "tiktok": return <PlayCircle className="w-5 h-5 text-white" />;
+      case "tiktok": return <TikTokIcon className="w-5 h-5 text-white" />;
       default: return <Target className="w-5 h-5 text-slate-400" />;
     }
   };
@@ -101,10 +99,20 @@ export default function CampaignDetailPage() {
     return budget > 0 ? Math.min((spend / budget) * 100, 100) : 0;
   };
 
+  const handlePauseCampaign = () => {
+    setCampaign(prev => ({
+      ...prev,
+      status: prev.status === "paused" ? "active" : "paused",
+    }));
+  };
+
   const handleStopCampaign = () => {
-    alert("Campaign stopped. Unused budget will be refunded to your wallet.");
+    setCampaign(prev => ({
+      ...prev,
+      status: "completed",
+    }));
     setShowStopModal(false);
-    router.push("/campaigns");
+    alert("Campaign stopped. Unused budget will be refunded to your wallet.");
   };
 
   return (
@@ -142,7 +150,7 @@ export default function CampaignDetailPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="group bg-slate-800/50 border border-slate-700 p-6 rounded-2xl hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/10">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-lg flex items-center justify-center">
@@ -306,7 +314,10 @@ export default function CampaignDetailPage() {
         <div className="flex gap-4">
           {campaign.status === "active" && (
             <>
-              <button className="px-6 py-3 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-xl font-semibold hover:bg-yellow-500/30 transition-all duration-300 flex items-center gap-2">
+              <button
+                onClick={handlePauseCampaign}
+                className="px-6 py-3 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-xl font-semibold hover:bg-yellow-500/30 transition-all duration-300 flex items-center gap-2"
+              >
                 <Pause className="w-4 h-4" />
                 Pause Campaign
               </button>
@@ -320,10 +331,19 @@ export default function CampaignDetailPage() {
             </>
           )}
           {campaign.status === "paused" && (
-            <button className="px-6 py-3 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl font-semibold hover:bg-green-500/30 transition-all duration-300 flex items-center gap-2">
+            <button
+              onClick={handlePauseCampaign}
+              className="px-6 py-3 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl font-semibold hover:bg-green-500/30 transition-all duration-300 flex items-center gap-2"
+            >
               <Play className="w-4 h-4" />
               Resume Campaign
             </button>
+          )}
+          {campaign.status === "completed" && (
+            <div className="px-6 py-3 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl font-semibold flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              Campaign Stopped
+            </div>
           )}
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getWalletBalance, addToWallet } from "@/lib/wallet";
 import { 
   Wallet, 
   Plus, 
@@ -13,15 +14,19 @@ import {
   Smartphone, 
   Bitcoin, 
   QrCode,
-  Flame
+  Flame,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 export default function WalletPage() {
   const [showAddFundsModal, setShowAddFundsModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"momo" | "crypto">("momo");
-
-  // Mock data - replace with actual API calls
-  const balance = 1250.00;
+  const [showBalance, setShowBalance] = useState(true);
+  const [balance, setBalance] = useState(0);
+  const [momoAmount, setMomoAmount] = useState(100);
+  const [momoPhone, setMomoPhone] = useState("");
+  const [cryptoAmount, setCryptoAmount] = useState(100);
   const transactions = [
     { id: 1, type: "deposit", method: "MTN Mobile Money", amount: 500.00, status: "completed", date: "2024-01-15T10:30:00Z" },
     { id: 2, type: "hold", method: "Campaign Hold", amount: -200.00, status: "active", date: "2024-01-15T09:00:00Z", campaignId: "cmp_123" },
@@ -29,6 +34,29 @@ export default function WalletPage() {
     { id: 4, type: "deposit", method: "Bitcoin", amount: 750.00, status: "completed", date: "2024-01-10T14:20:00Z" },
     { id: 5, type: "refund", method: "Campaign Refund", amount: 50.00, status: "completed", date: "2024-01-08T11:00:00Z", campaignId: "cmp_121" },
   ];
+
+  useEffect(() => {
+    try {
+      const b = getWalletBalance();
+      setBalance(b);
+    } catch (e) {}
+  }, []);
+
+  const confirmMomo = () => {
+    const amount = Number(momoAmount);
+    if (!amount || amount <= 0) return;
+    const next = addToWallet(amount, `MoMo:${momoPhone}`);
+    setBalance(next);
+    setShowAddFundsModal(false);
+  };
+
+  const confirmCrypto = () => {
+    const amount = Number(cryptoAmount);
+    if (!amount || amount <= 0) return;
+    const next = addToWallet(amount, "Crypto");
+    setBalance(next);
+    setShowAddFundsModal(false);
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -90,7 +118,12 @@ export default function WalletPage() {
                 <p className="text-white/80 text-xs">USD</p>
               </div>
             </div>
-            <p className="text-4xl md:text-5xl font-bold group-hover:scale-105 transition-transform duration-300">${balance.toFixed(2)}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-4xl md:text-5xl font-bold group-hover:scale-105 transition-transform duration-300">{showBalance ? `$${balance.toFixed(2)}` : '•••••'}</p>
+              <button onClick={() => setShowBalance((s) => !s)} className="text-white/80 hover:text-white rounded-md p-2">
+                {showBalance ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           <button
             onClick={() => setShowAddFundsModal(true)}
@@ -242,7 +275,7 @@ export default function WalletPage() {
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-slate-500 transition-all duration-300 text-sm"
                   />
                 </div>
-                <button className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 hover:scale-105 text-sm">
+                <button onClick={confirmMomo} className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 hover:scale-105 text-sm">
                   <Flame className="w-4 h-4" />
                   Request to Pay
                 </button>
@@ -276,16 +309,16 @@ export default function WalletPage() {
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-slate-500 transition-all duration-300 text-sm"
                   />
                 </div>
-                <div className="bg-slate-900 rounded-lg p-3 text-center border border-slate-700">
-                  <div className="w-8 h-8 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-1">
+                <div className="bg-slate-900 rounded-lg p-2 text-center border border-slate-700">
+                  <div className="w-7 h-7 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-1">
                     <QrCode className="w-4 h-4 text-pink-400" />
                   </div>
                   <p className="text-xs text-slate-400 mb-1">Scan QR code to pay</p>
-                  <div className="w-24 h-24 bg-slate-800 mx-auto rounded-lg flex items-center justify-center border border-slate-600">
+                  <div className="w-20 h-20 bg-slate-800 mx-auto rounded-lg flex items-center justify-center border border-slate-600">
                     <span className="text-slate-500 text-xs">QR Code</span>
                   </div>
                 </div>
-                <button className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 hover:scale-105 text-sm">
+                <button onClick={confirmCrypto} className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 hover:scale-105 text-sm">
                   <Flame className="w-4 h-4" />
                   I've Sent the Payment
                 </button>

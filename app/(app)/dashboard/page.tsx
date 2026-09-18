@@ -1,158 +1,450 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  Megaphone, 
-  DollarSign, 
-  Eye, 
-  Wallet, 
-  Plus, 
-  ArrowRight, 
-  CreditCard, 
+import { useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  CreditCard,
+  DollarSign,
+  Eye,
+  EyeOff,
+  Flame,
+  Megaphone,
+  Pause,
+  Play,
+  Plus,
   TrendingUp,
-  Flame
+  Wallet,
 } from "lucide-react";
+import { getWalletBalance, addToWallet, getTransactions } from "@/lib/wallet";
+
+type CampaignStatus = "live" | "paused" | "draft";
+
+type Campaign = {
+  id: number;
+  name: string;
+  status: CampaignStatus;
+  spend: number;
+  reach: number;
+  ctr: number;
+  budget: number;
+  platform: string;
+};
+
+type ActivityItem = {
+  id: number;
+  type: "deposit" | "campaign" | "spend";
+  description: string;
+  amount: string;
+  time: string;
+};
+
+const initialCampaigns: Campaign[] = [
+  { id: 1, name: "Summer Sale Push", status: "live", spend: 1480, reach: 32000, ctr: 4.8, budget: 2500, platform: "TikTok" },
+  { id: 2, name: "Brand Awareness", status: "paused", spend: 620, reach: 18000, ctr: 3.2, budget: 1200, platform: "Instagram" },
+  { id: 3, name: "Retargeting Boost", status: "draft", spend: 240, reach: 9000, ctr: 2.7, budget: 800, platform: "Meta" },
+  { id: 4, name: "Weekend Offer", status: "live", spend: 980, reach: 22000, ctr: 5.1, budget: 1800, platform: "Meta" },
+];
+
+const initialActivity: ActivityItem[] = [
+  { id: 1, type: "deposit", description: "Mobile Money deposit", amount: "+$500.00", time: "2 hours ago" },
+  { id: 2, type: "campaign", description: "Summer Sale campaign approved", amount: "", time: "5 hours ago" },
+  { id: 3, type: "spend", description: "Daily ad spend deduction", amount: "-$15.50", time: "1 day ago" },
+  { id: 4, type: "campaign", description: "New creative review complete", amount: "", time: "2 days ago" },
+];
 
 export default function DashboardPage() {
-  // Mock data - replace with actual API calls
-  const walletBalance = 1250.00;
-  const activeCampaigns = 3;
-  const totalSpendToday = 45.50;
-  const totalReach = 12500;
+  const router = useRouter();
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [showBalance, setShowBalance] = useState(true);
+  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+  const [activity, setActivity] = useState<ActivityItem[]>(initialActivity);
+  const [statusFilter, setStatusFilter] = useState<"all" | CampaignStatus>("all");
+  const [showFundsModal, setShowFundsModal] = useState(false);
+  const [fundAmount, setFundAmount] = useState("250");
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign>(initialCampaigns[0]);
+  const [toast, setToast] = useState("Dashboard refreshed");
 
-  const recentActivity = [
-    { id: 1, type: "deposit", description: "Mobile Money deposit", amount: "+$500.00", time: "2 hours ago" },
-    { id: 2, type: "campaign", description: "Summer Sale campaign approved", amount: "", time: "5 hours ago" },
-    { id: 3, type: "spend", description: "Daily ad spend deduction", amount: "-$15.50", time: "1 day ago" },
-  ];
+  const filteredCampaigns = useMemo(() => {
+    if (statusFilter === "all") return campaigns;
+    return campaigns.filter((campaign) => campaign.status === statusFilter);
+  }, [campaigns, statusFilter]);
+
+  const summary = useMemo(() => {
+    const activeCount = campaigns.filter((campaign) => campaign.status === "live").length;
+    const totalSpend = campaigns.reduce((sum, campaign) => sum + campaign.spend, 0);
+    const totalReach = campaigns.reduce((sum, campaign) => sum + campaign.reach, 0);
+    return {
+      activeCount,
+      totalSpend,
+      totalReach,
+      avgCtr: campaigns.reduce((sum, campaign) => sum + campaign.ctr, 0) / campaigns.length,
+    };
+  }, [campaigns]);
+
+  const handleCreateCampaign = () => {
+    setToast("Campaign workspace opened");
+    router.push("/campaigns/new");
+  };
+
+  const handleFundWallet = (event: React.FormEvent) => {
+    event.preventDefault();
+    const amount = Number(fundAmount);
+    if (!amount || amount <= 0) return;
+    const next = addToWallet(amount, "Manual top-up");
+    setWalletBalance(next);
+    setActivity((current) => [
+      { id: Date.now(), type: "deposit", description: `Wallet top-up of $${amount.toFixed(2)}`, amount: `+$${amount.toFixed(2)}`, time: "Just now" },
+      ...current,
+    ]);
+    setShowFundsModal(false);
+    setToast(`Added $${amount.toFixed(2)} to your wallet`);
+  };
+
+  // initialize balance from localStorage
+  useEffect(() => {
+    const b = getWalletBalance();
+    setWalletBalance(b);
+    const txs = getTransactions();
+    if (txs && txs.length) {
+      // inject latest deposits into activity
+      const deposits = txs.slice(0, 5).map((t) => ({ id: t.id, type: "deposit" as const, description: `${t.method} deposit`, amount: `+$${t.amount.toFixed(2)}`, time: new Date(t.date).toLocaleString() }));
+      setActivity((current) => [...deposits, ...current]);
+    }
+  }, []);
+
+  const handleToggleCampaign = (id: number) => {
+    setCampaigns((current) =>
+      current.map((campaign) => {
+        if (campaign.id !== id) return campaign;
+        const nextStatus: CampaignStatus = campaign.status === "live" ? "paused" : "live";
+        return { ...campaign, status: nextStatus };
+      })
+    );
+    setToast("Campaign status updated successfully");
+  };
+
+  const handleViewDetails = (campaignId: number) => {
+    router.push(`/campaigns/${campaignId}`);
+  };
+
+  const handleActivityAction = (item: ActivityItem) => {
+    if (item.type === "deposit") {
+      router.push("/wallet");
+    } else if (item.type === "campaign") {
+      router.push("/campaigns");
+    } else if (item.type === "spend") {
+      router.push("/billing");
+    } else {
+      // fallback
+      router.push("/activity");
+    }
+  };
 
   return (
-    <div className="p-6 min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Dashboard</h1>
-        <p className="text-base text-slate-400">Welcome back! Here's your campaign overview.</p>
+    <div className="min-h-screen p-6">
+      {toast ? (
+        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
+          {toast}
+        </div>
+      ) : null}
+
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="mb-2 text-4xl font-bold text-white md:text-5xl">Dashboard</h1>
+          <p className="text-base text-slate-400">Campaign overview and user operations center.</p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setShowFundsModal(true)}
+            className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-medium text-pink-600 transition hover:bg-pink-50"
+          >
+            <Plus className="h-4 w-4" />
+            Add funds
+          </button>
+          <button
+            type="button"
+            onClick={handleCreateCampaign}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-orange-500 px-4 py-2.5 font-medium text-white shadow-lg shadow-pink-500/20 transition hover:from-pink-400 hover:to-orange-400"
+          >
+            <Flame className="h-4 w-4" />
+            New campaign
+          </button>
+        </div>
       </div>
 
-      {/* Wallet Balance Card */}
-      <div className="bg-gradient-to-br from-pink-600 to-orange-600 rounded-2xl p-6 text-white mb-6 shadow-2xl shadow-pink-500/25 group hover:shadow-pink-500/40 transition-all duration-500 hover:-translate-y-1">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <Wallet className="w-5 h-5" />
+      <div className="mb-6 rounded-3xl bg-gradient-to-br from-pink-600 to-orange-600 p-6 text-white shadow-2xl shadow-pink-500/20">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+                <Wallet className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-pink-100 text-sm">Wallet Balance</p>
-                <p className="text-white/80 text-xs">Available funds</p>
+                <p className="text-sm text-pink-100">Wallet balance</p>
+                <p className="text-xs text-pink-100/80">Available funds</p>
               </div>
             </div>
-            <p className="text-4xl md:text-5xl font-bold group-hover:scale-105 transition-transform duration-300">${walletBalance.toFixed(2)}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-4xl font-bold">{showBalance ? `$${walletBalance.toFixed(2)}` : '•••••'}</p>
+              <button
+                onClick={() => setShowBalance((s) => !s)}
+                aria-label={showBalance ? 'Hide balance' : 'Show balance'}
+                className="text-slate-300 hover:text-white rounded-md p-2"
+              >
+                {showBalance ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowFundsModal(true)}
+                className="ml-4 px-3 py-2 rounded-md bg-white text-pink-600 text-sm font-medium hover:bg-pink-50"
+              >
+                Add funds
+              </button>
+            </div>
           </div>
-          <Link
-            href="/wallet"
-            className="px-6 py-3 bg-white text-pink-600 rounded-xl font-semibold hover:bg-pink-50 transition-all duration-300 flex items-center gap-2 group-hover:scale-105 shadow-lg"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="text-sm">Add Funds</span>
-          </Link>
+
+          <div className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm backdrop-blur-sm">
+            <p className="text-pink-100">This month</p>
+            <p className="mt-1 text-xl font-semibold">${(walletBalance * 0.22).toFixed(2)}</p>
+          </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <div className="group bg-slate-800/50 border border-slate-700 p-5 rounded-2xl hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/10 hover:-translate-y-1">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Megaphone className="w-5 h-5 text-pink-400" />
+      <div className="mb-6 grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-pink-500/10">
+              <Megaphone className="h-5 w-5 text-pink-400" />
             </div>
-            <span className="text-xs text-green-400 font-medium bg-green-500/10 px-2 py-1 rounded-full">Active</span>
+            <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs text-emerald-300">Live</span>
           </div>
-          <p className="text-3xl md:text-4xl font-bold text-white mb-1 group-hover:scale-105 transition-transform duration-300">{activeCampaigns}</p>
-          <p className="text-slate-400 text-xs">Active Campaigns</p>
+          <p className="text-3xl font-bold text-white">{summary.activeCount}</p>
+          <p className="mt-1 text-sm text-slate-400">Active campaigns</p>
         </div>
 
-        <div className="group bg-slate-800/50 border border-slate-700 p-5 rounded-2xl hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-1">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <DollarSign className="w-5 h-5 text-purple-400" />
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10">
+              <DollarSign className="h-5 w-5 text-violet-400" />
             </div>
-            <span className="text-xs text-slate-400">Today</span>
+            <span className="text-xs text-slate-300">Today</span>
           </div>
-          <p className="text-3xl md:text-4xl font-bold text-white mb-1 group-hover:scale-105 transition-transform duration-300">${totalSpendToday.toFixed(2)}</p>
-          <p className="text-slate-400 text-xs">Total Spend Today</p>
+          <p className="text-3xl font-bold text-white">${summary.totalSpend.toFixed(2)}</p>
+          <p className="mt-1 text-sm text-slate-400">Total spend</p>
         </div>
 
-        <div className="group bg-slate-800/50 border border-slate-700 p-5 rounded-2xl hover:border-orange-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-1">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-pink-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Eye className="w-5 h-5 text-orange-400" />
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/10">
+              <Eye className="h-5 w-5 text-orange-400" />
             </div>
-            <span className="text-xs text-slate-400">Total</span>
+            <span className="text-xs text-slate-300">Reach</span>
           </div>
-          <p className="text-3xl md:text-4xl font-bold text-white mb-1 group-hover:scale-105 transition-transform duration-300">{totalReach.toLocaleString()}</p>
-          <p className="text-slate-400 text-xs">Total Reach</p>
+          <p className="text-3xl font-bold text-white">{summary.totalReach.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-slate-400">Total reach</p>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-slate-800/50 border border-slate-700 p-5 rounded-2xl mb-6 hover:border-slate-600 transition-all duration-500">
-        <h2 className="text-xl md:text-2xl font-semibold text-white mb-4">Quick Actions</h2>
-        <div className="flex gap-4">
-          <Link
-            href="/campaigns/new"
-            className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 text-center flex items-center justify-center gap-2 group hover:scale-105 shadow-lg shadow-pink-500/25 text-sm"
-          >
-            <Flame className="w-4 h-4" />
-            Create New Campaign
-          </Link>
-          <Link
-            href="/campaigns"
-            className="flex-1 py-3 border-2 border-pink-500/50 text-pink-400 rounded-xl font-semibold hover:bg-pink-500/10 transition-all duration-300 text-center flex items-center justify-center gap-2 group hover:scale-105 text-sm"
-          >
-            View All Campaigns
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+      <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-xl font-semibold text-white">Campaign monitor</h2>
+          <div className="flex flex-wrap gap-2">
+            {(["all", "live", "paused", "draft"] as const).map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => setStatusFilter(filter)}
+                className={`rounded-full px-3 py-1.5 text-sm transition ${
+                  statusFilter === filter
+                    ? "bg-pink-500/15 text-pink-300 ring-1 ring-pink-500/40"
+                    : "bg-slate-800 text-slate-300 hover:text-white"
+                }`}
+              >
+                {filter === "all" ? "All" : filter}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Recent Activity */}
-      <div className="bg-slate-800/50 border border-slate-700 p-5 rounded-2xl hover:border-slate-600 transition-all duration-500">
-        <h2 className="text-xl md:text-2xl font-semibold text-white mb-4">Recent Activity</h2>
-        <div className="space-y-3">
-          {recentActivity.map((activity, index) => (
-            <div key={activity.id} className="flex items-center justify-between py-2 border-b border-slate-700 last:border-0 group hover:bg-slate-700/30 rounded-lg px-2 transition-all duration-300">
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  activity.type === "deposit" 
-                    ? "bg-green-500/20" 
-                    : activity.type === "campaign" 
-                    ? "bg-pink-500/20" 
-                    : "bg-orange-500/20"
-                }`}>
-                  {activity.type === "deposit" ? (
-                    <CreditCard className="w-4 h-4 text-green-400" />
-                  ) : activity.type === "campaign" ? (
-                    <Megaphone className="w-4 h-4 text-pink-400" />
-                  ) : (
-                    <TrendingUp className="w-4 h-4 text-orange-400" />
-                  )}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {filteredCampaigns.map((campaign) => (
+            <div key={campaign.id} className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-white">{campaign.name}</p>
+                  <p className="text-sm text-slate-400">{campaign.platform}</p>
+                </div>
+                <span
+                  className={`rounded-full px-2 py-1 text-xs ${
+                    campaign.status === "live"
+                      ? "bg-emerald-500/10 text-emerald-300"
+                      : campaign.status === "paused"
+                        ? "bg-yellow-500/10 text-yellow-300"
+                        : "bg-slate-500/10 text-slate-300"
+                  }`}
+                >
+                  {campaign.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <p className="text-slate-400">Spend</p>
+                  <p className="mt-1 font-semibold text-white">${campaign.spend}</p>
                 </div>
                 <div>
-                  <p className="text-white font-medium text-xs">{activity.description}</p>
-                  <p className="text-slate-400 text-xs">{activity.time}</p>
+                  <p className="text-slate-400">Reach</p>
+                  <p className="mt-1 font-semibold text-white">{campaign.reach.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400">CTR</p>
+                  <p className="mt-1 font-semibold text-white">{campaign.ctr}%</p>
                 </div>
               </div>
-              {activity.amount && (
-                <span className={`font-semibold text-xs ${
-                  activity.amount.startsWith("+") ? "text-green-400" : "text-red-400"
-                }`}>
-                  {activity.amount}
-                </span>
-              )}
+
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleViewDetails(campaign.id)}
+                  className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:border-pink-500/40 hover:text-white"
+                >
+                  <Eye className="h-4 w-4" />
+                  View Details
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleToggleCampaign(campaign.id)}
+                  className="flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm text-white hover:bg-slate-700"
+                >
+                  {campaign.status === "live" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                  {campaign.status === "live" ? "Pause" : "Resume"}
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-white">Recent activity</h2>
+            <button type="button" onClick={() => setToast("Activity stream refreshed")} className="text-sm text-pink-300 hover:text-pink-200">
+              Refresh
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {activity.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      item.type === "deposit"
+                        ? "bg-emerald-500/10"
+                        : item.type === "campaign"
+                          ? "bg-pink-500/10"
+                          : "bg-orange-500/10"
+                    }`}
+                  >
+                    {item.type === "deposit" ? (
+                      <CreditCard className="h-4 w-4 text-emerald-400" />
+                    ) : item.type === "campaign" ? (
+                      <Megaphone className="h-4 w-4 text-pink-400" />
+                    ) : (
+                      <TrendingUp className="h-4 w-4 text-orange-400" />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="font-medium text-white">{item.description}</p>
+                    <p className="text-xs text-slate-400">{item.time}</p>
+                  </div>
+                </div>
+
+                {item.amount ? (
+                  <span className={item.amount.startsWith("+") ? "text-emerald-300" : "text-red-300"}>{item.amount}</span>
+                ) : (
+                  <button type="button" onClick={() => handleActivityAction(item)} className="text-xs text-pink-300 hover:text-pink-200">Preview</button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-white">Campaign insights</h2>
+            <Link href="/campaigns" className="inline-flex items-center gap-1 text-sm text-pink-300 hover:text-pink-200">
+              View all <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+            <p className="text-sm text-slate-400">Selected campaign</p>
+            <p className="mt-2 text-xl font-semibold text-white">{selectedCampaign.name}</p>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between text-slate-300">
+                <span>Budget</span>
+                <span>${selectedCampaign.budget}</span>
+              </div>
+              <div className="flex justify-between text-slate-300">
+                <span>Spend</span>
+                <span>${selectedCampaign.spend}</span>
+              </div>
+              <div className="flex justify-between text-slate-300">
+                <span>Reach</span>
+                <span>{selectedCampaign.reach.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-slate-300">
+                <span>CTR</span>
+                <span>{selectedCampaign.ctr}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showFundsModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-white">Add wallet funds</h3>
+              <button type="button" onClick={() => setShowFundsModal(false)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <form onSubmit={handleFundWallet} className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm text-slate-300">Amount</label>
+                <input
+                  type="number"
+                  min="10"
+                  step="10"
+                  value={fundAmount}
+                  onChange={(event) => setFundAmount(event.target.value)}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-pink-500"
+                />
+              </div>
+
+              <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm text-slate-300">
+                Payment method: MTN MoMo / Bank transfer
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-gradient-to-r from-pink-500 to-orange-500 px-4 py-3 font-semibold text-white"
+              >
+                Confirm top-up
+              </button>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
