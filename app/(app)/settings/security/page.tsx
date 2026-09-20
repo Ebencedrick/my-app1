@@ -23,19 +23,45 @@ export default function SecuritySettingsPage() {
     setSecurityState({ ...securityState, [key]: !securityState[key] });
   };
 
-  const handlePasswordChange = () => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handlePasswordChange = async () => {
+    setErrorMessage("");
     if (passwords.newPassword.length < 8) {
-      alert("Password must be at least 8 characters long.");
+      setErrorMessage("Password must be at least 8 characters long.");
       return;
     }
     if (passwords.newPassword !== passwords.confirmPassword) {
-      alert("New passwords do not match.");
+      setErrorMessage("New passwords do not match.");
       return;
     }
 
-    setPasswords({ current: "", newPassword: "", confirmPassword: "" });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      setIsUpdating(true);
+      const res = await fetch("/api/users/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: passwords.current,
+          newPassword: passwords.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setPasswords({ current: "", newPassword: "", confirmPassword: "" });
+        setSaved(true);
+        setTimeout(() => setSaved(false), 4000);
+      } else {
+        setErrorMessage(data.error || "Failed to update password");
+      }
+    } catch (e) {
+      console.error(e);
+      setErrorMessage("Network error updating password");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -52,7 +78,13 @@ export default function SecuritySettingsPage() {
       {saved && (
         <div className="mb-6 p-4 rounded-2xl border border-green-500/40 bg-green-500/10 text-green-300 flex items-center gap-3">
           <Check className="w-5 h-5" />
-          Password updated successfully.
+          Password updated successfully in database.
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="mb-6 p-4 rounded-2xl border border-red-500/40 bg-red-500/10 text-red-300 flex items-center gap-3">
+          {errorMessage}
         </div>
       )}
 
@@ -101,9 +133,10 @@ export default function SecuritySettingsPage() {
             </div>
             <button
               onClick={handlePasswordChange}
-              className="w-full py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all"
+              disabled={isUpdating}
+              className="w-full py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all disabled:opacity-50"
             >
-              Update password
+              {isUpdating ? "Updating password..." : "Update password"}
             </button>
           </div>
         </div>

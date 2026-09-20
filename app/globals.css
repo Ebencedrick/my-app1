@@ -55,3 +55,327 @@ body {
 .dashboard-compact .text-3xl {
   font-size: 1.25rem !important;
 }
+
+/* Multi-Color & Light/Dark Theme System */
+:root, [data-theme="sunset"] {
+  --theme-from: #ec4899;
+  --theme-to: #f97316;
+  --theme-glow: rgba(236, 72, 153, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #030712 0%, #1e092b 50%, #200d1b 100%);
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #94a3b8;
+  --theme-card-bg: rgba(30, 41, 59, 0.5);
+  --theme-card-border: rgba(51, 65, 85, 0.6);
+}
+
+[data-theme="dark"] {
+  --theme-from: #38bdf8;
+  --theme-to: #818cf8;
+  --theme-glow: rgba(56, 189, 248, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #020617 0%, #0b1120 50%, #030712 100%);
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #94a3b8;
+  --theme-card-bg: rgba(15, 23, 42, 0.7);
+  --theme-card-border: rgba(30, 41, 59, 0.8);
+}
+
+[data-theme="light"] {
+  --theme-from: #ec4899;
+  --theme-to: #f97316;
+  --theme-glow: rgba(236, 72, 153, 0.15);
+  --theme-bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #334155;
+  --theme-card-bg: #ffffff;
+  --theme-card-border: #e2e8f0;
+}
+
+[data-theme="cosmic"] {
+  --theme-from: #8b5cf6;
+  --theme-to: #6366f1;
+  --theme-glow: rgba(139, 92, 246, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #030712 0%, #100e38 50%, #190e3d 100%);
+}
+
+[data-theme="ocean"] {
+  --theme-from: #06b6d4;
+  --theme-to: #3b82f6;
+  --theme-glow: rgba(6, 182, 212, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #030712 0%, #071f30 50%, #082942 100%);
+}
+
+[data-theme="emerald"] {
+  --theme-from: #10b981;
+  --theme-to: #14b8a6;
+  --theme-glow: rgba(16, 185, 129, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #030712 0%, #05261d 50%, #063328 100%);
+}
+
+[data-theme="solar"] {
+  --theme-from: #f59e0b;
+  --theme-to: #ef4444;
+  --theme-glow: rgba(245, 158, 11, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #030712 0%, #261205 50%, #301103 100%);
+}
+
+[data-theme="rose"] {
+  --theme-from: #d946ef;
+  --theme-to: #f43f5e;
+  --theme-glow: rgba(217, 70, 239, 0.25);
+  --theme-bg-gradient: linear-gradient(135deg, #030712 0%, #260a1d 50%, #330823 100%);
+}
+
+.theme-bg {
+  background: var(--theme-bg-gradient) !important;
+}
+
+.theme-gradient-text {
+  background: linear-gradient(to right, var(--theme-from), var(--theme-to)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.theme-gradient-bg {
+  background: linear-gradient(to right, var(--theme-from), var(--theme-to)) !important;
+}
+
+/* ==========================================================================
+   LIGHT MODE COMPREHENSIVE CONTRAST & COLOR BLENDING SYSTEM
+   ========================================================================== */
+
+[data-theme="light"] {
+  color-scheme: light;
+  --theme-from: #db2777;
+  --theme-to: #ea580c;
+  --theme-glow: rgba(219, 39, 119, 0.15);
+  --theme-bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #334155;
+  --theme-card-bg: #ffffff;
+  --theme-card-border: #cbd5e1;
+}
+
+[data-theme="light"] body {
+  color: #0f172a !important;
+  background: #f8fafc !important;
+}
+
+/* Headings & High-Emphasis Text */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6,
+[data-theme="light"] .text-white,
+[data-theme="light"] [class*="text-white/"] {
+  color: #0f172a !important;
+}
+
+/* General Text & Label Contrast - Deep, Clear and Legible */
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200 {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .text-slate-300 {
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="light"] .text-slate-400 {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .text-slate-500 {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .text-gray-100,
+[data-theme="light"] .text-gray-200 {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .text-gray-300 {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: #475569 !important;
+}
+
+/* Status & Accent Colors: Darkened for crisp readability on white */
+[data-theme="light"] .text-pink-200,
+[data-theme="light"] .text-pink-300 {
+  color: #9d174d !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-pink-400 {
+  color: #db2777 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-emerald-300,
+[data-theme="light"] .text-emerald-400 {
+  color: #047857 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-green-400,
+[data-theme="light"] .text-green-500 {
+  color: #15803d !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-amber-300,
+[data-theme="light"] .text-amber-400,
+[data-theme="light"] .text-yellow-400 {
+  color: #b45309 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-blue-300,
+[data-theme="light"] .text-blue-400 {
+  color: #1d4ed8 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-purple-300,
+[data-theme="light"] .text-purple-400 {
+  color: #7e22ce !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .text-orange-300,
+[data-theme="light"] .text-orange-400 {
+  color: #c2410c !important;
+  font-weight: 600 !important;
+}
+
+/* Backgrounds & Cards */
+[data-theme="light"] [class*="bg-slate-950"],
+[data-theme="light"] [class*="bg-slate-900"] {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] [class*="bg-slate-800"] {
+  background-color: #f8fafc !important;
+}
+
+[data-theme="light"] [class*="bg-slate-700"] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Subtle Tint Badges in Light Mode */
+[data-theme="light"] [class*="bg-pink-500/10"],
+[data-theme="light"] [class*="bg-pink-500/20"] {
+  background-color: #fdf2f8 !important;
+  border-color: #fbcfe8 !important;
+}
+
+[data-theme="light"] [class*="bg-emerald-500/10"],
+[data-theme="light"] [class*="bg-emerald-500/20"] {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+[data-theme="light"] [class*="bg-amber-500/10"],
+[data-theme="light"] [class*="bg-amber-500/20"] {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+[data-theme="light"] [class*="bg-blue-500/10"],
+[data-theme="light"] [class*="bg-blue-500/20"] {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+/* Borders & Dividers */
+[data-theme="light"] [class*="border-slate-800"],
+[data-theme="light"] [class*="border-slate-700"],
+[data-theme="light"] [class*="border-slate-600"] {
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] [class*="divide-slate-800"],
+[data-theme="light"] [class*="divide-slate-700"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* Inputs, Textareas, Selects */
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Table Headers & Rows */
+[data-theme="light"] th {
+  color: #475569 !important;
+  background-color: #f1f5f9 !important;
+}
+
+[data-theme="light"] tr.border-t {
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] td {
+  color: #1e293b !important;
+}
+
+/* Navigation & Header */
+[data-theme="light"] aside {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] header {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] aside nav a:not([class*="bg-gradient"]) {
+  color: #334155 !important;
+}
+
+[data-theme="light"] aside nav a:not([class*="bg-gradient"]):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Modal Windows in Light Mode */
+[data-theme="light"] .fixed.inset-0.bg-black\/70,
+[data-theme="light"] .fixed.inset-0.bg-black\/80 {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+}
+
+[data-theme="light"] .fixed.inset-0 .bg-slate-900,
+[data-theme="light"] .fixed.inset-0 .bg-slate-950 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Gradient Action Buttons: Preserve White Text */
+[data-theme="light"] button.bg-gradient-to-r,
+[data-theme="light"] a.bg-gradient-to-r,
+[data-theme="light"] .bg-gradient-to-r.text-white,
+[data-theme="light"] button[type="submit"].bg-gradient-to-r,
+[data-theme="light"] button.bg-gradient-to-r *,
+[data-theme="light"] a.bg-gradient-to-r *,
+[data-theme="light"] button[type="submit"].bg-gradient-to-r * {
+  color: #ffffff !important;
+}
+

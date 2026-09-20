@@ -19,8 +19,7 @@ export async function POST(request: Request) {
       user._id,
       {
         phoneVerified: true,
-        kycStatus: kycDocumentName ? "pending" : "verified",
-        ...(kycDocumentName ? { kycDocumentName } : {}),
+        ...(kycDocumentName ? { kycDocumentName, kycStatus: "pending" } : {}),
         ...(phone ? { phone: phone.trim() } : {}),
       },
       { new: true }

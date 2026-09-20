@@ -37,9 +37,9 @@ export default function PlanPage() {
       <div className="max-w-2xl w-full bg-slate-800/60 border border-slate-700 p-6 rounded-2xl shadow-2xl backdrop-blur-xl">
         <div className="mb-4">
           <p className="text-pink-300 text-xs uppercase tracking-[0.2em] font-medium">Step 2 of 2</p>
-          <h1 className="text-2xl md:text-3xl font-bold text-white mt-2">This platform is free to use</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mt-2">100% Free Account Access</h1>
           <p className="text-slate-400 mt-2 text-sm">
-            We do not charge monthly subscriptions or plan fees. Your campaigns only incur a 5% platform fee on the budget you deploy.
+            We do not charge monthly subscriptions or recurring plan fees. You only deposit what you choose to spend on your ad campaigns.
           </p>
           <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3">
             <div className="bg-gradient-to-r from-pink-500 to-orange-500 h-1.5 rounded-full" style={{ width: "100%" }}></div>
@@ -47,9 +47,9 @@ export default function PlanPage() {
         </div>
 
         <div className="rounded-2xl border border-pink-500/40 bg-pink-500/10 p-5 mb-5">
-          <p className="text-pink-300 text-xs uppercase tracking-[0.15em] mb-2">Fee model</p>
-          <p className="text-3xl font-bold text-white">5%</p>
-          <p className="text-slate-300 mt-1 text-sm">of the campaign budget you choose to spend</p>
+          <p className="text-pink-300 text-xs uppercase tracking-[0.15em] mb-1 font-semibold">Membership Tier</p>
+          <p className="text-3xl font-bold text-white">$0 / Free Forever</p>
+          <p className="text-slate-300 mt-1 text-sm">Zero subscription commitments. Full access to Meta & TikTok ads.</p>
         </div>
 
         <button

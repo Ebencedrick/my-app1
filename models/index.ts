@@ -5,3 +5,5 @@ export * from "./Deposit";
 export * from "./Campaign";
 export * from "./SpendSnapshot";
 export * from "./PricingPlan";
+export * from "./SupportTicket";
+export * from "./AdAccount";

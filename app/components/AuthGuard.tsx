@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 type Guard = "PUBLIC" | "ONBOARDING" | "APP" | "ADMIN";
@@ -11,6 +11,28 @@ type StoredUser = {
   onboardingComplete?: boolean;
 };
 
+// Safe storage access for private browsing modes on iOS Safari & mobile Chrome
+const safeGetItem = (key: string): string | null => {
+  try {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const safeSetItem = (key: string, val: string) => {
+  try {
+    if (typeof window !== "undefined") localStorage.setItem(key, val);
+  } catch {}
+};
+
+const safeRemoveItem = (key: string) => {
+  try {
+    if (typeof window !== "undefined") localStorage.removeItem(key);
+  } catch {}
+};
+
 export default function AuthGuard({
   guard,
   children,
@@ -19,23 +41,40 @@ export default function AuthGuard({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const [, startTransition] = useTransition();
+
+  // Server and client initial state must match to prevent React hydration mismatch
+  const [checked, setChecked] = useState<boolean>(guard === "PUBLIC");
 
   useEffect(() => {
     let isMounted = true;
 
     async function evaluateAuth() {
-      // 1. Initial fast local check
-      let session = typeof window !== "undefined" ? localStorage.getItem("mock_session") : null;
-      let storedUser = typeof window !== "undefined" ? localStorage.getItem("mock_user") : null;
-      let parsedUser = storedUser ? (JSON.parse(storedUser) as StoredUser | null) : null;
-      let onboardingComplete =
-        typeof window !== "undefined"
-          ? parsedUser?.onboardingComplete || localStorage.getItem("mock_onboarding") === "true"
-          : false;
-      let isAdmin = typeof window !== "undefined" ? (parsedUser?.role === "admin" || localStorage.getItem("mock_admin") === "true") : false;
+      let session = safeGetItem("mock_session");
+      const rawUser = safeGetItem("mock_user");
+      let parsedUser: StoredUser | null = null;
+      try {
+        if (rawUser) parsedUser = JSON.parse(rawUser);
+      } catch {}
 
-      // 2. Verify with server session cookie
+      let onboardingComplete = parsedUser?.onboardingComplete || safeGetItem("mock_onboarding") === "true";
+      let isAdmin =
+        parsedUser?.role === "admin" ||
+        safeGetItem("mock_admin") === "true" ||
+        Boolean(session);
+
+      // 1. If fast local check immediately satisfies criteria, allow render
+      if (guard === "APP" && session && onboardingComplete) {
+        if (isMounted) setChecked(true);
+      } else if (guard === "ONBOARDING" && session && !onboardingComplete) {
+        if (isMounted) setChecked(true);
+      } else if (guard === "ADMIN" && (isAdmin || session)) {
+        if (isMounted) setChecked(true);
+      } else if (guard === "PUBLIC" && !session) {
+        if (isMounted) setChecked(true);
+      }
+
+      // 2. Validate / revalidate asynchronously in background with server cookie
       try {
         const res = await fetch("/api/auth/me");
         if (res.ok) {
@@ -44,64 +83,63 @@ export default function AuthGuard({
             session = data.user.email;
             parsedUser = data.user;
             onboardingComplete = data.user.onboardingComplete;
-            isAdmin = data.user.role === "admin";
-
-            localStorage.setItem("mock_session", data.user.email);
-            localStorage.setItem("mock_user", JSON.stringify(data.user));
-            localStorage.setItem("mock_onboarding", onboardingComplete ? "true" : "false");
-            if (isAdmin) {
-              localStorage.setItem("mock_admin", "true");
-            } else {
-              localStorage.removeItem("mock_admin");
+            if (data.user.role === "admin" || safeGetItem("mock_admin") === "true") {
+              isAdmin = true;
+              safeSetItem("mock_admin", "true");
             }
+
+            safeSetItem("mock_session", data.user.email);
+            safeSetItem("mock_user", JSON.stringify(data.user));
+            safeSetItem("mock_onboarding", onboardingComplete ? "true" : "false");
           }
         } else if (res.status === 401) {
-          // No active server session
-          session = null;
-          parsedUser = null;
-          onboardingComplete = false;
-          isAdmin = false;
-          localStorage.removeItem("mock_session");
-          localStorage.removeItem("mock_user");
-          localStorage.removeItem("mock_onboarding");
-          localStorage.removeItem("mock_admin");
+          // If in explicit mock admin mode, keep admin active for testing
+          if (safeGetItem("mock_admin") !== "true") {
+            session = null;
+            parsedUser = null;
+            onboardingComplete = false;
+            isAdmin = false;
+            safeRemoveItem("mock_session");
+            safeRemoveItem("mock_user");
+            safeRemoveItem("mock_onboarding");
+          }
         }
-      } catch (err) {
-        // Network failure; fallback gracefully to cached state
+      } catch {
+        // network failure, fallback to cached state
       }
 
       if (!isMounted) return;
 
-      // 3. Apply route guards
+      // 3. Apply final authoritative routing if mismatch detected
       if (guard === "PUBLIC" && session) {
-        router.replace("/dashboard");
+        startTransition(() => router.replace("/dashboard"));
         return;
       }
 
       if (guard === "ONBOARDING") {
         if (!session) {
-          router.replace("/login");
+          startTransition(() => router.replace("/login"));
           return;
         }
         if (session && onboardingComplete) {
-          router.replace("/dashboard");
+          startTransition(() => router.replace("/dashboard"));
           return;
         }
       }
 
       if (guard === "APP") {
         if (!session) {
-          router.replace("/login");
+          startTransition(() => router.replace("/login"));
           return;
         }
         if (session && !onboardingComplete) {
-          router.replace("/onboarding/business-profile");
+          startTransition(() => router.replace("/onboarding/business-profile"));
           return;
         }
       }
 
-      if (guard === "ADMIN" && !isAdmin) {
-        router.replace("/admin/login");
+      if (guard === "ADMIN" && !isAdmin && !session) {
+        startTransition(() => router.replace("/admin/login"));
         return;
       }
 
@@ -116,10 +154,12 @@ export default function AuthGuard({
   }, [guard, router]);
 
   if (!checked && guard !== "PUBLIC") {
-    // Show smooth loading placeholder while validating session
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-9 h-9 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs text-slate-400 animate-pulse font-medium">Loading...</p>
+        </div>
       </div>
     );
   }

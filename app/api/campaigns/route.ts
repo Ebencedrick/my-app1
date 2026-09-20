@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     if (balanceSummary.availableBalance < totalCharge) {
       return NextResponse.json(
         {
-          error: `Insufficient available funds. Total campaign cost is $${totalCharge.toFixed(2)} (Ad spend: $${totalAdSpend.toFixed(2)} + 5% fee: $${managementFee.toFixed(2)}), but your available balance is $${balanceSummary.availableBalance.toFixed(2)}. Please add funds to your wallet first.`,
+          error: `Insufficient available funds. Required campaign budget is $${totalCharge.toFixed(2)}, but your available balance is $${balanceSummary.availableBalance.toFixed(2)}. Please add funds to your wallet first.`,
           required: totalCharge,
           available: balanceSummary.availableBalance,
         },

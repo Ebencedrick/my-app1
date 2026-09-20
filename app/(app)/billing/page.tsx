@@ -1,56 +1,114 @@
 "use client";
 
-import { useState } from "react";
-import { X, Download } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Download, FileText, Loader2, Sparkles } from "lucide-react";
+
+interface InvoiceItem {
+  id: string;
+  date: string;
+  type: "campaign" | "deposit";
+  description: string;
+  amount: number;
+  status: string;
+  items: Array<{ description: string; amount: number }>;
+}
+
+const defaultInvoices: InvoiceItem[] = [
+  {
+    id: "INV-SMP-001",
+    date: new Date().toISOString(),
+    type: "campaign",
+    description: "Welcome Campaign Sample",
+    amount: 50.0,
+    status: "paid",
+    items: [
+      { description: "Ad Campaign Budget (5 days × $10/day)", amount: 50.0 },
+    ],
+  },
+];
 
 export default function BillingPage() {
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [invoices, setInvoices] = useState<InvoiceItem[]>(defaultInvoices);
+  const [loading, setLoading] = useState(true);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceItem | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  const invoices = [
-    {
-      id: "INV-2024-001",
-      date: "2024-01-15",
-      type: "campaign",
-      description: "Summer Sale 2024 Campaign",
-      amount: 374.33,
-      status: "paid",
-      items: [
-        { description: "Ad Spend (7 days × $50/day)", amount: 350.0 },
-        { description: "Platform Fee (5%)", amount: 52.5 },
-        { description: "Refund (unused budget)", amount: -28.17 },
-      ],
-    },
-    {
-      id: "INV-2024-003",
-      date: "2024-01-05",
-      type: "campaign",
-      description: "New Product Launch Campaign",
-      amount: 345.0,
-      status: "paid",
-      items: [
-        { description: "Ad Spend (10 days × $30/day)", amount: 300.0 },
-        { description: "Platform Fee (5%)", amount: 45.0 },
-      ],
-    },
-    {
-      id: "INV-2024-004",
-      date: "2023-12-20",
-      type: "campaign",
-      description: "Flash Sale Campaign",
-      amount: 230.0,
-      status: "paid",
-      items: [
-        { description: "Ad Spend (5 days × $40/day)", amount: 200.0 },
-        { description: "Platform Fee (5%)", amount: 30.0 },
-      ],
-    },
-  ];
+  useEffect(() => {
+    async function loadBillingData() {
+      try {
+        setLoading(true);
+        const [campRes, txRes] = await Promise.all([
+          fetch("/api/campaigns"),
+          fetch("/api/wallet/transactions?limit=20"),
+        ]);
+
+        const items: InvoiceItem[] = [];
+
+        if (campRes.ok) {
+          const campData = await campRes.json();
+          if (campData.campaigns && campData.campaigns.length > 0) {
+            campData.campaigns.forEach((c: any) => {
+              const adSpend = c.totalAdSpend || c.dailyBudget * c.days || 0;
+              const fee = c.managementFee || Number((adSpend * 0.05).toFixed(2));
+              const total = c.totalCharge || adSpend + fee;
+
+              items.push({
+                id: `INV-${c._id.slice(-6).toUpperCase()}`,
+                date: c.createdAt || new Date().toISOString(),
+                type: "campaign",
+                description: `${c.name || "Ad"} Campaign`,
+                amount: adSpend,
+                status: c.status === "completed" ? "paid" : c.status === "active" ? "active" : "pending",
+                items: [
+                  { description: `Ad Campaign Spend (${c.days || 7} days × $${c.dailyBudget || 10}/day)`, amount: adSpend },
+                ],
+              });
+            });
+          }
+        }
+
+        if (txRes.ok) {
+          const txData = await txRes.json();
+          if (txData.transactions && txData.transactions.length > 0) {
+            txData.transactions
+              .filter((t: any) => t.type === "deposit")
+              .forEach((t: any) => {
+                items.push({
+                  id: `DEP-${t._id.slice(-6).toUpperCase()}`,
+                  date: t.createdAt,
+                  type: "deposit",
+                  description: `${t.gateway ? t.gateway.toUpperCase() : "Wallet"} Deposit`,
+                  amount: t.amount,
+                  status: "paid",
+                  items: [
+                    { description: `Wallet Balance Credit (${t.gateway ? t.gateway.toUpperCase() : "MoMo"})`, amount: t.amount },
+                  ],
+                });
+              });
+          }
+        }
+
+        if (items.length > 0) {
+          // Sort chronologically newest first
+          items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setInvoices(items);
+        }
+      } catch (err) {
+        console.error("Failed to load billing data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadBillingData();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "paid":
         return "text-green-400";
+      case "active":
+        return "text-emerald-400";
       case "pending":
         return "text-yellow-400";
       case "overdue":
@@ -68,27 +126,29 @@ export default function BillingPage() {
     });
   };
 
-  const viewInvoiceDetails = (invoice: any) => {
+  const viewInvoiceDetails = (invoice: InvoiceItem) => {
     setSelectedInvoice(invoice);
     setShowDetailsModal(true);
   };
 
-  const downloadPDF = (invoice: any) => {
+  const downloadPDF = (invoice: InvoiceItem) => {
     const invoiceContent = `
-INVOICE
-=======
-Invoice ID: ${invoice.id}
+INVOICE / RECEIPT
+==================
+Reference ID: ${invoice.id}
 Date: ${formatDate(invoice.date)}
 Status: ${invoice.status.toUpperCase()}
 
 Description: ${invoice.description}
-Type: ${invoice.type.toUpperCase()}
+Category: ${invoice.type.toUpperCase()}
 
-ITEMS:
-${invoice.items.map((item: any) => `${item.description}: $${item.amount.toFixed(2)}`).join("\n")}
+BREAKDOWN:
+${invoice.items.map((item) => `* ${item.description}: $${item.amount.toFixed(2)}`).join("\n")}
 
 TOTAL: $${invoice.amount.toFixed(2)}
 
+Platform: Social Ad Management Platform (Model B Reseller)
+All ad spend is executed directly on verified Meta & TikTok Business accounts.
 Thank you for your business!
     `.trim();
 
@@ -113,20 +173,26 @@ Thank you for your business!
       <div className="bg-gradient-to-r from-pink-600 to-orange-600 rounded-2xl p-6 text-white mb-6 shadow-2xl shadow-pink-500/25">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-pink-100 mb-2 text-sm">Platform model</p>
-            <p className="text-3xl md:text-4xl font-bold mb-1">Free access</p>
-            <p className="text-pink-200">No monthly fee. 5% charged on campaign budget.</p>
+            <p className="text-pink-100 mb-2 text-sm font-medium">Access Tier</p>
+            <p className="text-3xl md:text-4xl font-bold mb-1">Free Lifetime Access</p>
+            <p className="text-pink-200 text-sm">No monthly recurring fee or subscription plans. You only pay for your ad budget.</p>
           </div>
-          <div className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm">
-            <div className="text-xs uppercase tracking-[0.18em] text-pink-100">Campaign fee</div>
-            <div className="text-2xl font-bold">5%</div>
+          <div className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm border border-white/15">
+            <div className="text-xs uppercase tracking-[0.18em] text-pink-100">Monthly Plan Fee</div>
+            <div className="text-2xl font-bold">$0 / Free</div>
           </div>
         </div>
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-700 rounded-2xl">
-        <div className="p-4 border-b border-slate-700">
-          <h2 className="text-xl md:text-2xl font-semibold text-white">Invoice History</h2>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-white">Invoice History</h2>
+          {loading && (
+            <div className="flex items-center gap-2 text-xs text-pink-400">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Syncing with ledger...</span>
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -143,14 +209,14 @@ Thank you for your business!
             </thead>
             <tbody className="divide-y divide-slate-700">
               {invoices.map((invoice) => (
-                <tr key={invoice.id} className="hover:bg-slate-700/30">
+                <tr key={invoice.id} className="hover:bg-slate-700/30 transition-colors">
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-xs font-medium text-white">{invoice.id}</span>
+                    <span className="text-xs font-mono font-medium text-white">{invoice.id}</span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-400">{formatDate(invoice.date)}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div>
-                      <span className="text-xs text-white">{invoice.description}</span>
+                      <span className="text-xs text-white font-medium">{invoice.description}</span>
                       <span className="block text-xs text-slate-400 capitalize">{invoice.type}</span>
                     </div>
                   </td>
@@ -159,9 +225,9 @@ Thank you for your business!
                     <span className={`text-xs font-medium capitalize ${getStatusColor(invoice.status)}`}>{invoice.status}</span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-xs font-medium">
-                    <div className="flex gap-2">
-                      <button onClick={() => viewInvoiceDetails(invoice)} className="text-pink-400 hover:text-pink-300">View Details</button>
-                      <button onClick={() => downloadPDF(invoice)} className="text-pink-400 hover:text-pink-300">Download</button>
+                    <div className="flex gap-3">
+                      <button onClick={() => viewInvoiceDetails(invoice)} className="text-pink-400 hover:text-pink-300 transition-colors">View Details</button>
+                      <button onClick={() => downloadPDF(invoice)} className="text-slate-400 hover:text-white transition-colors">Download</button>
                     </div>
                   </td>
                 </tr>
@@ -184,7 +250,7 @@ Thank you for your business!
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-slate-700">
                 <span className="text-slate-400 text-sm">Invoice ID</span>
-                <span className="text-white font-medium text-sm">{selectedInvoice.id}</span>
+                <span className="text-white font-mono font-medium text-sm">{selectedInvoice.id}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-700">
                 <span className="text-slate-400 text-sm">Date</span>
@@ -195,17 +261,17 @@ Thank you for your business!
                 <span className={`text-white font-medium text-sm capitalize ${getStatusColor(selectedInvoice.status)}`}>{selectedInvoice.status}</span>
               </div>
               <div className="py-2 border-b border-slate-700">
-                <span className="text-slate-400 text-sm block mb-2">Items</span>
+                <span className="text-slate-400 text-sm block mb-2">Itemized Breakdown</span>
                 <div className="space-y-2">
-                  {selectedInvoice.items.map((item: any, index: number) => (
+                  {selectedInvoice.items.map((item, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-slate-300">{item.description}</span>
-                      <span className="text-white">${item.amount.toFixed(2)}</span>
+                      <span className="text-white font-medium">${item.amount.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="flex justify-between items-center py-2 bg-gradient-to-r from-pink-500/10 to-orange-500/10 rounded-lg px-4">
+              <div className="flex justify-between items-center py-2.5 bg-gradient-to-r from-pink-500/10 to-orange-500/10 rounded-lg px-4 border border-pink-500/20">
                 <span className="text-white font-semibold text-sm">Total</span>
                 <span className="text-pink-400 font-bold text-lg">${selectedInvoice.amount.toFixed(2)}</span>
               </div>
@@ -213,7 +279,7 @@ Thank you for your business!
 
             <button onClick={() => downloadPDF(selectedInvoice)} className="w-full mt-6 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25">
               <Download className="w-4 h-4" />
-              Download PDF
+              Download Receipt (.txt)
             </button>
           </div>
         </div>

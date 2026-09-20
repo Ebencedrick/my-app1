@@ -24,13 +24,13 @@ export default function PricingPage() {
         <section className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pink-500/30 bg-pink-500/10 text-pink-300 text-xs font-medium mb-6">
             <Sparkles className="w-4 h-4" />
-            Simple campaign setup
+            100% Free Platform Access
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
-            Campaign pricing is shown when you are ready to launch.
+            No subscription fees. Deposit and run your ads freely.
           </h1>
           <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Once a user has funded their wallet and begins creating a campaign, the platform can share the exact fee breakdown, budget strategy, and launch details at that point.
+            Create an account with zero commitments. No international credit card required. Deposit your ad budget via Mobile Money or crypto, and we handle campaign delivery on Facebook, Instagram, and TikTok.
           </p>
         </section>
 
@@ -38,7 +38,7 @@ export default function PricingPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div>
               <p className="text-sm uppercase tracking-[0.18em] text-pink-300 mb-2">How it works</p>
-              <h3 className="text-3xl font-bold">Built for campaign launch, not public pricing noise.</h3>
+              <h3 className="text-3xl font-bold">Built for simple execution, not subscription lock-ins.</h3>
             </div>
           </div>
 
@@ -47,16 +47,16 @@ export default function PricingPage() {
               <div className="w-11 h-11 rounded-xl bg-pink-500/15 flex items-center justify-center mb-4">
                 <Zap className="w-5 h-5 text-pink-400" />
               </div>
-              <h4 className="text-lg font-semibold mb-2">Fund wallet</h4>
-              <p className="text-sm text-slate-300">Users deposit funds before campaign setup begins.</p>
+              <h4 className="text-lg font-semibold mb-2">1. Fund your wallet</h4>
+              <p className="text-sm text-slate-300">Deposit only what you want to spend on ads via MTN MoMo, Orange, or crypto.</p>
             </div>
 
             <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-5">
               <div className="w-11 h-11 rounded-xl bg-purple-500/15 flex items-center justify-center mb-4">
                 <TrendingUp className="w-5 h-5 text-purple-400" />
               </div>
-              <h4 className="text-lg font-semibold mb-2">Create campaign</h4>
-              <p className="text-sm text-slate-300">Once campaign details are selected, the fee model is shown clearly.</p>
+              <h4 className="text-lg font-semibold mb-2">2. Build your ad</h4>
+              <p className="text-sm text-slate-300">Upload your image or video, set your daily budget, and choose target audience.</p>
             </div>
 
             <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-5">

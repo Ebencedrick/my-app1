@@ -78,9 +78,22 @@ export default function VerifyPage() {
         </div>
 
         <div className="bg-slate-800/60 border border-slate-700 p-5 rounded-2xl shadow-2xl backdrop-blur-xl">
+          <div className="mb-4 p-3 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-between gap-3">
+            <div className="text-xs text-slate-300">
+              <span className="font-semibold text-pink-300">⚡ Note:</span> Account verification is optional for now. You can skip directly to campaign launch.
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push("/onboarding/plan")}
+              className="px-3 py-1.5 rounded-lg bg-pink-500 hover:bg-pink-600 text-white font-semibold text-xs transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              Skip & Continue →
+            </button>
+          </div>
+
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-white mb-1">Phone Verification</h2>
-            <p className="text-slate-400 text-sm">We will send a verification code to confirm your mobile number.</p>
+            <h2 className="text-lg font-semibold text-white mb-1">Phone Verification (Optional)</h2>
+            <p className="text-slate-400 text-sm">You can verify your phone number now or complete it later.</p>
           </div>
 
           {!isCodeSent ? (

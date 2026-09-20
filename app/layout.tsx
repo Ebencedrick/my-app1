@@ -17,7 +17,11 @@ export const metadata: Metadata = {
   description: "No credit card required. Deposit via Mobile Money or crypto, and we'll run your Facebook, Instagram, and TikTok ads for you.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"

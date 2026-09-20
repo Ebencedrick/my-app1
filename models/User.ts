@@ -13,6 +13,7 @@ export interface IUser extends Document {
   platformFocus?: string[];
   role: "user" | "admin";
   planId?: string;
+  themePreference?: string;
   kycStatus: "unverified" | "pending" | "verified" | "rejected";
   kycDocumentName?: string;
   phoneVerified: boolean;
@@ -35,6 +36,7 @@ const UserSchema = new Schema<IUser>(
     platformFocus: [{ type: String, trim: true }],
     role: { type: String, enum: ["user", "admin"], default: "user" },
     planId: { type: String, default: "pay_as_you_go" },
+    themePreference: { type: String, default: "sunset" },
     kycStatus: {
       type: String,
       enum: ["unverified", "pending", "verified", "rejected"],

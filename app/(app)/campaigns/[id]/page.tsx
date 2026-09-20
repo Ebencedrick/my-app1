@@ -24,7 +24,9 @@ import {
   Loader2,
   AlertCircle,
   Clock,
-  Sparkles
+  Sparkles,
+  ExternalLink,
+  Globe
 } from "lucide-react";
 import TikTokIcon from "@/components/ui/TikTokIcon";
 
@@ -78,6 +80,9 @@ export default function CampaignDetailPage() {
   const id = (params?.id as string) || "";
   
   const [showStopModal, setShowStopModal] = useState(false);
+  const [showDestinationModal, setShowDestinationModal] = useState(false);
+  const [activeChartMetric, setActiveChartMetric] = useState<"impressions" | "clicks" | "spend">("impressions");
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(6);
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -385,35 +390,145 @@ export default function CampaignDetailPage() {
         </div>
       </div>
 
-      {/* Performance Chart */}
+      {/* Performance Chart with Interactive Bar Details */}
       <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl mb-8 hover:border-slate-600 transition-all duration-500">
-        <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-pink-400" />
-          Performance Over Time
-        </h2>
-        <div className="h-64 flex items-end justify-between gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-pink-400" />
+              Performance Over Time
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Select a metric or click any day bar below to inspect detailed daily delivery stats
+            </p>
+          </div>
+          
+          {/* Metric Selector Tabs */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-900/80 border border-slate-700/80 rounded-xl">
+            <button
+              onClick={() => setActiveChartMetric("impressions")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                activeChartMetric === "impressions"
+                  ? "bg-gradient-to-r from-pink-500 to-orange-500 text-white shadow-md shadow-pink-500/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              Impressions
+            </button>
+            <button
+              onClick={() => setActiveChartMetric("clicks")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                activeChartMetric === "clicks"
+                  ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              Clicks
+            </button>
+            <button
+              onClick={() => setActiveChartMetric("spend")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                activeChartMetric === "spend"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              Spend ($)
+            </button>
+          </div>
+        </div>
+
+        {/* Bars Container */}
+        <div className="h-64 flex items-end justify-between gap-2 pt-6 pb-2 border-b border-slate-700/60">
           {campaign.performanceData.map((data, index) => {
-            const maxImpressions = Math.max(...campaign.performanceData.map(d => d.impressions)) || 1;
-            const height = Math.max(10, (data.impressions / maxImpressions) * 100);
+            const rawValue = data[activeChartMetric];
+            const maxVal = Math.max(...campaign.performanceData.map(d => d[activeChartMetric])) || 1;
+            const height = Math.max(12, (rawValue / maxVal) * 100);
+            const isSelected = selectedDayIndex === index;
+
+            let barGradient = "from-pink-500 to-orange-500";
+            let hoverGradient = "group-hover:from-pink-400 group-hover:to-orange-400";
+            if (activeChartMetric === "clicks") {
+              barGradient = "from-purple-500 to-indigo-500";
+              hoverGradient = "group-hover:from-purple-400 group-hover:to-indigo-400";
+            } else if (activeChartMetric === "spend") {
+              barGradient = "from-emerald-500 to-teal-500";
+              hoverGradient = "group-hover:from-emerald-400 group-hover:to-teal-400";
+            }
+
             return (
-              <div key={index} className="flex-1 flex flex-col items-center group">
+              <button 
+                key={index} 
+                onClick={() => setSelectedDayIndex(index)}
+                className="flex-1 flex flex-col items-center group h-full justify-end cursor-pointer focus:outline-none"
+              >
+                <div className={`text-[10px] font-semibold mb-1.5 transition-all ${
+                  isSelected ? "text-white scale-110" : "text-slate-400 opacity-0 group-hover:opacity-100"
+                }`}>
+                  {activeChartMetric === "spend" ? `$${rawValue.toFixed(1)}` : rawValue.toLocaleString()}
+                </div>
                 <div 
-                  className="w-full bg-gradient-to-t from-pink-500 to-orange-500 rounded-t transition-all duration-300 group-hover:from-pink-400 group-hover:to-orange-400" 
+                  className={`w-full rounded-t-lg transition-all duration-300 bg-gradient-to-t ${barGradient} ${hoverGradient} ${
+                    isSelected ? "ring-2 ring-white shadow-lg shadow-pink-500/30 brightness-110 scale-[1.03]" : "opacity-85 group-hover:opacity-100"
+                  }`} 
                   style={{ height: `${height}%` }}
                 ></div>
-                <div className="text-xs text-slate-400 mt-2 text-center group-hover:text-white transition-colors">
-                  {new Date(data.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                <div className={`text-xs mt-2 text-center transition-colors font-medium ${
+                  isSelected ? "text-white font-bold" : "text-slate-400 group-hover:text-slate-200"
+                }`}>
+                  {new Date(data.date).toLocaleDateString("en-US", { weekday: "short" })}
                 </div>
-              </div>
+                <div className="text-[10px] text-slate-500">
+                  {new Date(data.date).toLocaleDateString("en-US", { month: "numeric", day: "numeric" })}
+                </div>
+              </button>
             );
           })}
         </div>
-        <div className="flex justify-center gap-6 mt-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gradient-to-r from-pink-500 to-orange-500 rounded"></div>
-            <span className="text-slate-400">Impressions (Trend)</span>
-          </div>
-        </div>
+
+        {/* Selected Day Inspector Card */}
+        {campaign.performanceData[selectedDayIndex] && (() => {
+          const selectedDay = campaign.performanceData[selectedDayIndex];
+          const dayCtr = selectedDay.impressions > 0 ? ((selectedDay.clicks / selectedDay.impressions) * 100).toFixed(2) : "0.00";
+          const dayCpc = selectedDay.clicks > 0 ? (selectedDay.spend / selectedDay.clicks).toFixed(2) : "0.00";
+
+          return (
+            <div className="mt-5 p-4 rounded-xl bg-slate-900/70 border border-slate-700/80 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-xs">
+                  {new Date(selectedDay.date).toLocaleDateString("en-US", { day: "numeric" })}
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white">
+                    {new Date(selectedDay.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                  </div>
+                  <div className="text-[11px] text-slate-400">
+                    Day #{selectedDayIndex + 1} of campaign schedule
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8">
+                <div>
+                  <div className="text-[11px] text-slate-400">Impressions</div>
+                  <div className="text-sm font-bold text-white">{selectedDay.impressions.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-slate-400">Clicks</div>
+                  <div className="text-sm font-bold text-purple-400">{selectedDay.clicks.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-slate-400">Day Spend</div>
+                  <div className="text-sm font-bold text-emerald-400">${selectedDay.spend.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-slate-400">CTR / CPC</div>
+                  <div className="text-sm font-bold text-orange-400">{dayCtr}% <span className="text-slate-500 font-normal">(${dayCpc})</span></div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -452,10 +567,7 @@ export default function CampaignDetailPage() {
               <span className="text-slate-400">Daily Budget</span>
               <span className="text-white font-medium">${campaign.dailyBudget.toFixed(2)}/day</span>
             </div>
-            <div className="flex justify-between p-3 bg-slate-900/50 rounded-lg">
-              <span className="text-slate-400">Platform Management Fee</span>
-              <span className="text-white">${campaign.managementFee.toFixed(2)} (5%)</span>
-            </div>
+
             <div className="flex justify-between p-3 bg-slate-900/50 rounded-lg">
               <span className="text-slate-400">Start Date</span>
               <span className="text-white">{campaign.startDate ? new Date(campaign.startDate).toLocaleDateString() : "Pending review"}</span>
@@ -507,9 +619,19 @@ export default function CampaignDetailPage() {
               )}
             </div>
             <p className="text-white text-sm mb-3 font-normal leading-relaxed">{campaign.creative.copyText}</p>
-            <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg text-xs font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300">
-              {campaign.creative.cta}
-            </button>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setShowDestinationModal(true)}
+                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-lg text-xs font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 shadow-md shadow-pink-500/20 flex items-center gap-1.5 cursor-pointer"
+                title="Click to test live destination page simulation"
+              >
+                <span>{campaign.creative.cta}</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-[11px] text-slate-400">
+                Click button to preview destination
+              </span>
+            </div>
           </div>
           <div className="text-sm text-slate-400 space-y-1">
             <p><strong className="text-slate-300">Media Type:</strong> <span className="capitalize">{campaign.creative.mediaType}</span></p>
@@ -610,6 +732,102 @@ export default function CampaignDetailPage() {
                 {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Square className="w-4 h-4" />}
                 Confirm Stop
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ad Destination / Landing Page Simulator Modal */}
+      {showDestinationModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
+            {/* Simulated Browser Bar */}
+            <div className="bg-slate-800/90 px-4 py-3 border-b border-slate-700 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+              </div>
+              
+              <div className="flex-1 max-w-lg bg-slate-950/80 border border-slate-700/80 rounded-lg px-3 py-1 flex items-center gap-2 text-xs text-slate-300">
+                <Globe className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                <span className="truncate text-slate-400">
+                  https://app.growthhub.io/preview/{campaign.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}?utm_source={campaign.platforms[0] || "feed"}&utm_medium=paid_ad&utm_campaign={encodeURIComponent(campaign.name)}
+                </span>
+              </div>
+
+              <button
+                onClick={() => setShowDestinationModal(false)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
+                title="Close simulator"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Simulated Webpage Content */}
+            <div className="overflow-y-auto p-6 space-y-6">
+              <div className="bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-orange-500/10 border border-pink-500/20 rounded-2xl p-6 text-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-xs font-semibold mb-3">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Live Ad Destination Preview
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {campaign.name}
+                </h3>
+                <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+                  {campaign.creative.copyText}
+                </p>
+              </div>
+
+              {/* Destination Landing Card */}
+              <div className="bg-slate-800/60 border border-slate-700/80 rounded-xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-white">Call to Action Triggered</div>
+                  <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-medium">
+                    Status: Tracking Active
+                  </span>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-700/60">
+                    <span className="text-slate-400 block mb-1">Assigned Action:</span>
+                    <span className="text-white font-semibold text-sm">{campaign.creative.cta}</span>
+                  </div>
+                  <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-700/60">
+                    <span className="text-slate-400 block mb-1">Target Audience:</span>
+                    <span className="text-white font-medium">{campaign.targeting.location} ({campaign.targeting.ageRange})</span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-700/60 text-xs space-y-1.5">
+                  <span className="text-slate-400 block font-medium">Attribution & UTM Tracking Parameters:</span>
+                  <div className="font-mono text-slate-300 text-[11px] break-all">
+                    • utm_source: <span className="text-pink-400">{campaign.platforms.join(", ")}</span><br />
+                    • utm_medium: <span className="text-purple-400">cpc</span><br />
+                    • utm_campaign: <span className="text-emerald-400">{campaign.name}</span><br />
+                    • utm_content: <span className="text-orange-400">{campaign.creative.mediaType}_variant</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conversion Simulator */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                <div className="text-xs text-slate-400 text-center sm:text-left">
+                  This simulated page verifies your ad CTA route and conversion attribution funnel.
+                </div>
+                <button
+                  onClick={() => {
+                    setActionSuccess("Simulated test conversion registered!");
+                    setTimeout(() => setActionSuccess(null), 4000);
+                    setShowDestinationModal(false);
+                  }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold text-xs rounded-xl hover:from-pink-400 hover:to-orange-400 transition-all duration-300 shadow-lg shadow-pink-500/25 flex items-center gap-2 cursor-pointer"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  Simulate Successful Conversion
+                </button>
+              </div>
             </div>
           </div>
         </div>

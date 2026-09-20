@@ -16,6 +16,11 @@ import {
   Plus,
   TrendingUp,
   Wallet,
+  Smartphone,
+  Bitcoin,
+  QrCode,
+  X,
+  Loader2,
 } from "lucide-react";
 
 type CampaignStatus = "live" | "paused" | "draft" | "pending";
@@ -61,7 +66,13 @@ export default function DashboardPage() {
   const [activity, setActivity] = useState<ActivityItem[]>(initialActivity);
   const [statusFilter, setStatusFilter] = useState<"all" | CampaignStatus>("all");
   const [showFundsModal, setShowFundsModal] = useState(false);
-  const [fundAmount, setFundAmount] = useState("250");
+  const [activeDepositTab, setActiveDepositTab] = useState<"momo" | "crypto">("momo");
+  const [momoPhone, setMomoPhone] = useState("+237 670 000 000");
+  const [momoAmount, setMomoAmount] = useState(100);
+  const [cryptoAmount, setCryptoAmount] = useState(100);
+  const [cryptoCurrency, setCryptoCurrency] = useState("usdt");
+  const [isDepositing, setIsDepositing] = useState(false);
+  const [depositError, setDepositError] = useState<string | null>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>(initialCampaigns[0]);
   const [toast, setToast] = useState<string | null>("Dashboard refreshed");
 
@@ -87,38 +98,55 @@ export default function DashboardPage() {
     router.push("/campaigns/new");
   };
 
-  const handleFundWallet = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const amount = Number(fundAmount);
-    if (!amount || amount <= 0) return;
+  const handleConfirmDeposit = async (gateway: "momo" | "crypto") => {
+    const amount = gateway === "momo" ? Number(momoAmount) : Number(cryptoAmount);
+    if (!amount || amount < 5) {
+      setDepositError("Minimum deposit amount is $5.00");
+      return;
+    }
+    if (gateway === "momo" && !momoPhone) {
+      setDepositError("Please enter your mobile money phone number");
+      return;
+    }
 
     try {
+      setIsDepositing(true);
+      setDepositError(null);
       const res = await fetch("/api/wallet/deposit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, gateway: "momo" }),
+        body: JSON.stringify({
+          amount,
+          gateway,
+          phone: gateway === "momo" ? momoPhone : undefined,
+          cryptoCurrency: gateway === "crypto" ? cryptoCurrency : undefined,
+        }),
       });
+
       const data = await res.json();
       if (res.ok) {
         setWalletBalance(data.balance || 0);
+        localStorage.setItem("mock_wallet_balance", String(data.balance || 0));
         setActivity((current) => [
           {
             id: Date.now(),
             type: "deposit",
-            description: `Wallet deposit of $${amount.toFixed(2)}`,
+            description: `${gateway === "momo" ? "Mobile Money" : cryptoCurrency.toUpperCase()} deposit of $${amount.toFixed(2)}`,
             amount: `+$${amount.toFixed(2)}`,
             time: "Just now",
           },
           ...current,
         ]);
-        setToast(`Added $${amount.toFixed(2)} to your wallet`);
+        setToast(`Successfully deposited $${amount.toFixed(2)} into your ledger wallet!`);
+        setShowFundsModal(false);
       } else {
-        setToast(data.error || "Deposit failed");
+        setDepositError(data.error || "Deposit failed");
       }
-    } catch {
-      setToast("Network error during deposit");
+    } catch (err: any) {
+      console.error(err);
+      setDepositError("Network error during deposit");
     } finally {
-      setShowFundsModal(false);
+      setIsDepositing(false);
     }
   };
 
@@ -523,41 +551,148 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {showFundsModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-xl font-semibold text-white">Add wallet funds</h3>
-              <button type="button" onClick={() => setShowFundsModal(false)} className="text-slate-400 hover:text-white">✕</button>
+      {showFundsModal && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-white">Add Funds</h2>
+                <p className="text-xs text-slate-400 mt-0.5">Deposit directly into your ledger wallet</p>
+              </div>
+              <button
+                onClick={() => setShowFundsModal(false)}
+                className="text-slate-400 hover:text-white transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <form onSubmit={handleFundWallet} className="space-y-4">
-              <div>
-                <label className="mb-2 block text-sm text-slate-300">Amount</label>
-                <input
-                  type="number"
-                  min="10"
-                  step="10"
-                  value={fundAmount}
-                  onChange={(event) => setFundAmount(event.target.value)}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-pink-500"
-                />
+            {depositError && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs">
+                {depositError}
               </div>
+            )}
 
-              <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm text-slate-300">
-                Payment method: MTN MoMo / Bank transfer
-              </div>
-
+            {/* Tabs */}
+            <div className="flex mb-4 bg-slate-900 rounded-xl p-1 border border-slate-800">
               <button
-                type="submit"
-                className="w-full rounded-xl bg-gradient-to-r from-pink-500 to-orange-500 px-4 py-3 font-semibold text-white"
+                onClick={() => setActiveDepositTab("momo")}
+                className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-xs ${
+                  activeDepositTab === "momo"
+                    ? "bg-gradient-to-r from-pink-500 to-orange-500 text-white shadow-lg shadow-pink-500/25"
+                    : "text-slate-400 hover:text-white"
+                }`}
               >
-                Confirm top-up
+                <Smartphone className="w-3.5 h-3.5" />
+                Mobile Money
               </button>
-            </form>
+              <button
+                onClick={() => setActiveDepositTab("crypto")}
+                className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-xs ${
+                  activeDepositTab === "crypto"
+                    ? "bg-gradient-to-r from-pink-500 to-orange-500 text-white shadow-lg shadow-pink-500/25"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <Bitcoin className="w-3.5 h-3.5" />
+                Crypto
+              </button>
+            </div>
+
+            {/* Mobile Money Tab */}
+            {activeDepositTab === "momo" && (
+              <div className="space-y-3.5">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Phone Number (MTN / Orange) *
+                  </label>
+                  <input
+                    type="tel"
+                    value={momoPhone}
+                    onChange={(e) => setMomoPhone(e.target.value)}
+                    placeholder="+237 6XX XXX XXX"
+                    className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-slate-500 transition-all text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Amount (USD) *
+                  </label>
+                  <input
+                    type="number"
+                    value={momoAmount}
+                    onChange={(e) => setMomoAmount(Number(e.target.value))}
+                    placeholder="100.00"
+                    min="5"
+                    className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-slate-500 transition-all text-sm"
+                  />
+                </div>
+                <button
+                  onClick={() => handleConfirmDeposit("momo")}
+                  disabled={isDepositing}
+                  className="w-full py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 disabled:opacity-50 text-sm"
+                >
+                  {isDepositing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flame className="w-4 h-4" />}
+                  {isDepositing ? "Processing..." : "Confirm & Deposit"}
+                </button>
+                <p className="text-[11px] text-slate-400 text-center">
+                  Funds are instantly credited to your MongoDB ledger wallet.
+                </p>
+              </div>
+            )}
+
+            {/* Crypto Tab */}
+            {activeDepositTab === "crypto" && (
+              <div className="space-y-3.5">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Select Cryptocurrency
+                  </label>
+                  <select 
+                    value={cryptoCurrency}
+                    onChange={(e) => setCryptoCurrency(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white transition-all text-sm"
+                  >
+                    <option value="usdt">USDT (TRC20 / ERC20)</option>
+                    <option value="btc">Bitcoin (BTC)</option>
+                    <option value="eth">Ethereum (ETH)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Amount (USD) *
+                  </label>
+                  <input
+                    type="number"
+                    value={cryptoAmount}
+                    onChange={(e) => setCryptoAmount(Number(e.target.value))}
+                    placeholder="100.00"
+                    min="5"
+                    className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-slate-500 transition-all text-sm"
+                  />
+                </div>
+                <div className="bg-slate-900 rounded-xl p-3 text-center border border-slate-800">
+                  <div className="w-8 h-8 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-1 text-pink-400">
+                    <QrCode className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs text-slate-300 font-medium">Scan QR Code or copy deposit address</p>
+                  <p className="text-[11px] text-slate-500 font-mono mt-1 break-all bg-slate-950 p-2 rounded border border-slate-800">
+                    0x71C...AdsPlatformTreasuryUSD
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleConfirmDeposit("crypto")}
+                  disabled={isDepositing}
+                  className="w-full py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-semibold hover:from-pink-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 disabled:opacity-50 text-sm"
+                >
+                  {isDepositing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flame className="w-4 h-4" />}
+                  {isDepositing ? "Confirming..." : "Confirm & Deposit"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
