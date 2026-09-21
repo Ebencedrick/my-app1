@@ -14,10 +14,11 @@ export default function LandingHeader() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
 
-    const savedMode = localStorage.getItem("adflux-landing-theme");
-    const nextMode = savedMode ? savedMode === "dark" : true;
-    setIsDarkMode(nextMode);
-    document.documentElement.setAttribute("data-theme", nextMode ? "dark" : "light");
+    const savedMode = localStorage.getItem("app_theme");
+    const nextMode = savedMode ? savedMode === "light" : false;
+    setIsDarkMode(!nextMode);
+    document.documentElement.setAttribute("data-theme", nextMode ? "light" : "dark");
+    document.documentElement.style.colorScheme = nextMode ? "light" : "dark";
 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -25,8 +26,10 @@ export default function LandingHeader() {
   const toggleTheme = () => {
     const nextMode = !isDarkMode;
     setIsDarkMode(nextMode);
-    document.documentElement.setAttribute("data-theme", nextMode ? "dark" : "light");
-    localStorage.setItem("adflux-landing-theme", nextMode ? "dark" : "light");
+    const themeName = nextMode ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", themeName);
+    document.documentElement.style.colorScheme = themeName === "light" ? "light" : "dark";
+    localStorage.setItem("app_theme", themeName);
   };
 
   const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -79,12 +82,12 @@ export default function LandingHeader() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               aria-label="Toggle color theme"
               onClick={toggleTheme}
-              className={`hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${buttonClasses}`}
+              className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors sm:h-10 sm:w-10 ${buttonClasses}`}
             >
               {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -98,18 +101,23 @@ export default function LandingHeader() {
               </Link>
             </div>
 
-            <button
-              type="button"
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-menu"
-              className="md:hidden p-2 rounded-md border border-slate-700/60 bg-slate-900/60 text-white relative z-[9999]"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMenuOpen((s) => !s);
-              }}
-            >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            <div className="flex items-center gap-2 md:hidden">
+              <Link href="/login" className="inline-flex items-center rounded-lg bg-white/5 px-2.5 py-2 text-xs font-medium text-slate-100 ring-1 ring-white/10">
+                Sign in
+              </Link>
+              <button
+                type="button"
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-menu"
+                className="p-2 rounded-md border border-slate-700/60 bg-slate-900/60 text-white relative z-[9999]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMenuOpen((s) => !s);
+                }}
+              >
+                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -121,18 +129,6 @@ export default function LandingHeader() {
                 <Link href="/pricing" className="block text-sm text-slate-200 hover:text-white transition-colors">Pricing</Link>
                 <Link href="/about" className="block text-sm text-slate-200 hover:text-white transition-colors">About</Link>
                 <Link href="/contact" className="block text-sm text-slate-200 hover:text-white transition-colors">Contact</Link>
-                <div className="flex items-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={toggleTheme}
-                    className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-slate-700 bg-slate-900 text-slate-100"
-                  >
-                    {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  </button>
-                  <Link href="/login" className="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-100">
-                    Sign in
-                  </Link>
-                </div>
                 <Link href="/signup" className="block w-full text-center rounded-lg bg-gradient-to-r from-orange-400 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white">
                   Get Started
                 </Link>
