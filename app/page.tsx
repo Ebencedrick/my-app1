@@ -38,200 +38,195 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-pink-950 overflow-hidden">
-      {/* Hero Background Illustration */}
-      <div className="fixed inset-0 pointer-events-none -z-10">
-        <svg className="w-full h-full" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.12),transparent_28%),linear-gradient(135deg,#020817_0%,#0b1220_30%,#111827_100%)] text-slate-50">
+      <div className="fixed inset-0 pointer-events-none -z-10 opacity-90">
+        <svg className="h-full w-full" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="g1" x1="0" x2="1">
-              <stop offset="0%" stopColor="#FF77A9" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#FFB77A" stopOpacity="0.06" />
-            </linearGradient>
-            <linearGradient id="g2" x1="0" x2="1">
-              <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.06" />
-              <stop offset="100%" stopColor="#FB7185" stopOpacity="0.05" />
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.10" />
+              <stop offset="50%" stopColor="#a855f7" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#f97316" stopOpacity="0.08" />
             </linearGradient>
           </defs>
-
           <rect width="100%" height="100%" fill="url(#g1)" />
-
-          {/* Network nodes and links */}
-          <g stroke="#ffffff" strokeOpacity="0.06" strokeWidth="1">
-            <line x1="8%" y1="20%" x2="30%" y2="10%" />
-            <line x1="30%" y1="10%" x2="60%" y2="18%" />
-            <line x1="60%" y1="18%" x2="85%" y2="8%" />
-            <line x1="12%" y1="70%" x2="40%" y2="65%" />
-            <line x1="40%" y1="65%" x2="70%" y2="72%" />
-            <line x1="70%" y1="72%" x2="92%" y2="60%" />
+          <g stroke="#ffffff" strokeOpacity="0.05" strokeWidth="1">
+            <line x1="8%" y1="18%" x2="28%" y2="14%" />
+            <line x1="28%" y1="14%" x2="48%" y2="22%" />
+            <line x1="48%" y1="22%" x2="74%" y2="12%" />
+            <line x1="18%" y1="74%" x2="42%" y2="68%" />
+            <line x1="42%" y1="68%" x2="66%" y2="78%" />
+            <line x1="66%" y1="78%" x2="92%" y2="64%" />
           </g>
-
-          <g fill="#fff" fillOpacity="0.07">
-            <circle cx="8%" cy="20%" r="60" />
-            <circle cx="30%" cy="10%" r="48" />
-            <circle cx="60%" cy="18%" r="72" />
-            <circle cx="85%" cy="8%" r="40" />
-            <circle cx="12%" cy="70%" r="56" />
-            <circle cx="40%" cy="65%" r="64" />
-            <circle cx="70%" cy="72%" r="52" />
-            <circle cx="92%" cy="60%" r="36" />
+          <g fill="#ffffff" fillOpacity="0.04">
+            <circle cx="8%" cy="18%" r="60" />
+            <circle cx="28%" cy="14%" r="52" />
+            <circle cx="48%" cy="22%" r="74" />
+            <circle cx="74%" cy="12%" r="44" />
+            <circle cx="18%" cy="74%" r="58" />
+            <circle cx="42%" cy="68%" r="68" />
+            <circle cx="66%" cy="78%" r="52" />
+            <circle cx="92%" cy="64%" r="38" />
           </g>
-
-          <rect width="100%" height="100%" fill="url(#g2)" />
         </svg>
       </div>
 
       <LandingHeader />
 
       <main className="relative z-10">
-        {/* Hero Section */}
-        <section className="min-h-screen flex items-center pt-20">
-          <div className="max-w-7xl mx-auto px-6 py-16">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-500/10 border border-pink-500/20 rounded-lg mb-4 animate-fade-in">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  <span className="text-xs text-pink-400 font-medium">Now supporting TikTok Ads</span>
+        <section className="flex min-h-[calc(100vh-4rem)] items-center pt-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 md:px-8 lg:px-10">
+            <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
+              <div className="space-y-6 lg:space-y-7">
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1.5 text-[11px] font-medium tracking-[0.18em] text-cyan-200 uppercase shadow-[0_0_30px_rgba(34,211,238,0.18)]">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.9)]" />
+                  Growth campaigns live
                 </div>
 
-                <div className="mb-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
-                  <div className="relative w-full max-w-[760px] h-[160px] md:h-[200px]">
+                <div className="animate-slide-up">
+                  <div className="relative h-[120px] w-full max-w-[760px] sm:h-[150px] md:h-[180px] lg:h-[204px]">
                     <Image
                       src="/adflux-logo.png"
                       alt="AdFlux logo"
                       fill
                       priority
-                      className="object-contain object-left"
+                      className="object-contain object-left select-none"
+                      unoptimized
                     />
                   </div>
                 </div>
 
-                <p className="text-base text-slate-400 max-w-xl leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                  Launch viral campaigns on Facebook, Instagram, and TikTok with Mobile Money payments. 
-                  Turn your content into engagement and sales.
-                </p>
-                
-                <div className="flex gap-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                  <Link href="/signup" className="px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-pink-400 hover:to-orange-400 transition-all shadow-lg shadow-pink-500/25 flex items-center gap-2 group">
-                    Start Your Campaign
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="max-w-xl space-y-4 animate-slide-up" style={{ animationDelay: "0.15s" }}>
+                  <h1 className="text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl md:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
+                    Turn attention into
+                    <span className="block bg-gradient-to-r from-cyan-300 via-sky-400 to-pink-500 bg-clip-text text-transparent">high-converting growth.</span>
+                  </h1>
+                  <p className="max-w-lg text-sm leading-7 text-slate-300 sm:text-base">
+                    Build demand, run smarter social campaigns, and manage ad spend from one place designed for modern brands and ambitious teams.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 animate-slide-up" style={{ animationDelay: "0.25s" }}>
+                  <Link href="/signup" className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 via-orange-500 to-amber-400 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_35px_rgba(249,115,22,0.35)] transition-transform hover:-translate-y-0.5">
+                    Start your campaign
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/pricing" className="inline-flex items-center rounded-xl border border-slate-700 bg-slate-900/60 px-5 py-3 text-sm font-medium text-slate-100 transition-colors hover:border-slate-500">
+                    View pricing
                   </Link>
                 </div>
 
-                <div className="flex items-center gap-6 pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+                <div className="flex items-center gap-6 pt-2 animate-slide-up" style={{ animationDelay: "0.35s" }}>
                   <div className="flex -space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 border-2 border-slate-950 flex items-center justify-center text-white text-xs font-bold">JD</div>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-slate-950 flex items-center justify-center text-white text-xs font-bold">AK</div>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 border-2 border-slate-950 flex items-center justify-center text-white text-xs font-bold">MN</div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-950 bg-gradient-to-br from-pink-500 to-orange-500 text-[10px] font-bold text-white">JD</div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-950 bg-gradient-to-br from-purple-500 to-pink-500 text-[10px] font-bold text-white">AK</div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-950 bg-gradient-to-br from-cyan-400 to-blue-500 text-[10px] font-bold text-white">MN</div>
                   </div>
                   <div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-yellow-400">
                       {[...Array(5)].map((_, i) => (
-                        <Sparkles key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <Sparkles key={i} className="h-4 w-4 fill-current" />
                       ))}
                     </div>
-                    <p className="text-xs text-slate-400">Trusted by 500+ businesses</p>
+                    <p className="text-xs text-slate-300">Trusted by 500+ performance-focused teams</p>
                   </div>
                 </div>
               </div>
 
-              {/* Hero Visual - Realistic phone mockup visible on both desktop and mobile */}
-              <div className="relative animate-fade-in my-8 md:my-0" style={{ animationDelay: '0.3s' }}>
+              <div className="relative mx-auto w-full max-w-[420px] animate-fade-in" style={{ animationDelay: "0.3s" }}>
                 <div className="relative mx-auto w-[290px] sm:w-[330px] md:w-[360px] lg:w-[390px]">
-                  <div className="absolute -left-8 top-20 hidden sm:block animate-float" style={{ animationDelay: '0.3s' }}>
-                    <div className="bg-blue-500/20 backdrop-blur-sm rounded-full p-3 border border-blue-500/30">
-                      <Facebook className="w-6 h-6 text-blue-500" />
+                  <div className="absolute -left-6 top-20 hidden sm:block animate-float">
+                    <div className="rounded-full border border-blue-400/30 bg-blue-500/10 p-3 backdrop-blur-sm">
+                      <Facebook className="h-6 w-6 text-blue-400" />
                     </div>
                   </div>
-                  <div className="absolute -right-8 top-28 hidden sm:block animate-float" style={{ animationDelay: '0.6s' }}>
-                    <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-full p-3 border border-pink-500/30">
-                      <Instagram className="w-6 h-6 text-pink-500" />
+                  <div className="absolute -right-6 top-28 hidden sm:block animate-float" style={{ animationDelay: "0.6s" }}>
+                    <div className="rounded-full border border-pink-400/30 bg-pink-500/10 p-3 backdrop-blur-sm">
+                      <Instagram className="h-6 w-6 text-pink-400" />
                     </div>
                   </div>
-                  <div className="absolute -left-4 bottom-24 hidden sm:block animate-float" style={{ animationDelay: '0.9s' }}>
-                    <div className="bg-black/30 backdrop-blur-sm rounded-full p-3 border border-white/20">
-                      <TikTokIcon className="w-6 h-6 text-white" />
+                  <div className="absolute -left-2 bottom-24 hidden sm:block animate-float" style={{ animationDelay: "1s" }}>
+                    <div className="rounded-full border border-white/20 bg-black/20 p-3 backdrop-blur-sm">
+                      <TikTokIcon className="h-6 w-6 text-white" />
                     </div>
                   </div>
 
-                  <div className="relative mx-auto w-full h-[520px] bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-[2.5rem] border-[3px] border-slate-700 shadow-[0_30px_80px_rgba(236,72,153,0.25)]">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-slate-950 rounded-b-2xl border border-slate-800/80"></div>
+                  <div className="relative h-[520px] rounded-[2.5rem] border border-slate-700/80 bg-gradient-to-br from-slate-900 via-slate-950 to-[#0b1023] shadow-[0_30px_80px_rgba(14,165,233,0.18)]">
+                    <div className="absolute left-1/2 top-0 h-6 w-28 -translate-x-1/2 rounded-b-2xl border border-slate-800 bg-slate-950" />
 
-                    <div className="absolute inset-4 rounded-[2rem] overflow-hidden bg-gradient-to-br from-[#1a0d35] via-[#120e41] to-[#0b1736]">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(236,72,153,0.22),transparent_34%)]" />
-
-                      <div className="relative p-4 space-y-4">
+                    <div className="absolute inset-4 overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.14),transparent_25%),radial-gradient(circle_at_bottom_right,_rgba(236,72,153,0.18),transparent_30%),linear-gradient(135deg,#130f2e,#0d152d_42%,#121827_100%)]">
+                      <div className="relative space-y-4 p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-cyan-500/30">A</div>
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-pink-500 text-[10px] font-bold text-white shadow-[0_0_30px_rgba(34,211,238,0.4)]">A</div>
                             <div>
-                              <div className="text-white text-[11px] font-semibold">AdFlux Studio</div>
-                              <div className="text-cyan-300 text-[10px]">@adflux</div>
+                              <div className="text-[11px] font-semibold text-white">AdFlux Studio</div>
+                              <div className="text-[10px] text-cyan-300">@adflux</div>
                             </div>
                           </div>
                           <div className="rounded-full bg-pink-500/15 p-2">
-                            <Heart className="w-4 h-4 text-pink-400 fill-pink-400" />
+                            <Heart className="h-4 w-4 fill-pink-400 text-pink-400" />
                           </div>
                         </div>
 
                         <div className="rounded-2xl border border-cyan-400/20 bg-slate-900/50 p-3 shadow-inner shadow-cyan-500/10">
-                          <div className="flex items-center justify-between text-[10px] text-cyan-200 mb-2">
+                          <div className="mb-2 flex items-center justify-between text-[10px] text-cyan-200">
                             <span>Campaign live</span>
-                            <span className="rounded-full bg-green-500/15 px-1.5 py-0.5 text-green-300">Live</span>
+                            <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-emerald-300">Live</span>
                           </div>
-                          <div className="text-white text-sm font-semibold leading-snug">Launch your next viral brand push for 4x more attention.</div>
+                          <div className="text-sm font-semibold leading-snug text-white">Launch your next growth push with more attention and less guesswork.</div>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2">
                           <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-2 text-center">
-                            <div className="text-white text-base font-bold">18.6K</div>
-                            <div className="text-cyan-300 text-[9px] uppercase tracking-wide">Reach</div>
+                            <div className="text-base font-bold text-white">18.6K</div>
+                            <div className="text-[9px] uppercase tracking-[0.18em] text-cyan-300">Reach</div>
                           </div>
                           <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-2 text-center">
-                            <div className="text-white text-base font-bold">2.4%</div>
-                            <div className="text-pink-300 text-[9px] uppercase tracking-wide">CTR</div>
+                            <div className="text-base font-bold text-white">2.4%</div>
+                            <div className="text-[9px] uppercase tracking-[0.18em] text-pink-300">CTR</div>
                           </div>
                           <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-2 text-center">
-                            <div className="text-white text-base font-bold">3.8x</div>
-                            <div className="text-violet-300 text-[9px] uppercase tracking-wide">ROAS</div>
+                            <div className="text-base font-bold text-white">3.8x</div>
+                            <div className="text-[9px] uppercase tracking-[0.18em] text-violet-300">ROAS</div>
                           </div>
                         </div>
 
                         <div className="rounded-2xl border border-slate-700 bg-slate-900/40 p-3">
-                          <div className="flex items-center justify-between mb-3">
+                          <div className="mb-3 flex items-center justify-between">
                             <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Audience</div>
                             <div className="text-[10px] text-emerald-300">+28% this week</div>
                           </div>
                           <div className="space-y-2">
                             <div>
-                              <div className="flex justify-between text-[10px] text-slate-300 mb-1">
+                              <div className="mb-1 flex justify-between text-[10px] text-slate-300">
                                 <span>18-34</span>
                                 <span>74%</span>
                               </div>
-                              <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                                <div className="h-full w-[74%] bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 rounded-full" />
+                              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+                                <div className="h-full w-[74%] rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500" />
                               </div>
                             </div>
                             <div>
-                              <div className="flex justify-between text-[10px] text-slate-300 mb-1">
+                              <div className="mb-1 flex justify-between text-[10px] text-slate-300">
                                 <span>Interest match</span>
                                 <span>89%</span>
                               </div>
-                              <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                                <div className="h-full w-[89%] bg-gradient-to-r from-pink-400 via-fuchsia-500 to-violet-500 rounded-full" />
+                              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+                                <div className="h-full w-[89%] rounded-full bg-gradient-to-r from-pink-400 via-fuchsia-500 to-violet-500" />
                               </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/12 to-cyan-500/12 p-3">
+                        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 p-3">
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-emerald-400" />
-                            <span className="text-white text-xs font-semibold">Attention score up 234%</span>
+                            <TrendingUp className="h-4 w-4 text-emerald-400" />
+                            <span className="text-xs font-semibold text-white">Attention score up 234%</span>
                           </div>
                         </div>
 
                         <div className="relative h-24 rounded-2xl border border-slate-700 bg-slate-900/50 p-3">
-                          <div className="absolute inset-x-3 bottom-3 flex items-end gap-2 h-14">
+                          <div className="absolute inset-x-3 bottom-3 flex h-14 items-end gap-2">
                             {[38, 52, 44, 68, 78, 92, 88].map((height, idx) => (
                               <div
                                 key={idx}
@@ -240,10 +235,10 @@ export default function Home() {
                               />
                             ))}
                           </div>
-                          <div className="absolute top-3 right-3 flex gap-2">
-                            <div className="bg-pink-500/20 p-1.5 rounded-full"><Heart className="w-3 h-3 text-pink-400 fill-pink-400" /></div>
-                            <div className="bg-purple-500/20 p-1.5 rounded-full"><ThumbsUp className="w-3 h-3 text-purple-300" /></div>
-                            <div className="bg-orange-500/20 p-1.5 rounded-full"><MessageCircle className="w-3 h-3 text-orange-300" /></div>
+                          <div className="absolute right-3 top-3 flex gap-2">
+                            <div className="rounded-full bg-pink-500/20 p-1.5"><Heart className="h-3 w-3 fill-pink-400 text-pink-400" /></div>
+                            <div className="rounded-full bg-purple-500/20 p-1.5"><ThumbsUp className="h-3 w-3 text-purple-300" /></div>
+                            <div className="rounded-full bg-orange-500/20 p-1.5"><MessageCircle className="h-3 w-3 text-orange-300" /></div>
                           </div>
                         </div>
                       </div>
@@ -256,11 +251,11 @@ export default function Home() {
         </section>
 
         {/* Platform Icons */}
-        <section className="py-20 border-y border-slate-800/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-orange-500/5"></div>
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <p className="text-center text-sm text-slate-400 mb-12 font-medium uppercase tracking-wider">Run ads on all major platforms</p>
-            <div className="flex flex-wrap justify-center gap-6 sm:gap-12 items-center">
+        <section className="relative overflow-hidden border-y border-slate-800/50 py-16">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-orange-500/5" />
+          <div className="relative z-10 mx-auto max-w-7xl px-6">
+            <p className="mb-10 text-center text-sm font-medium uppercase tracking-[0.22em] text-slate-400">Run ads on all major platforms</p>
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12">
               <div className="group relative">
                 <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="relative bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/30 rounded-2xl p-4 sm:p-6 sm:hover:scale-110 sm:hover:-translate-y-2 transition-all duration-300">
@@ -295,45 +290,45 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent"></div>
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-white mb-4">Everything You Need to Succeed</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">Powerful features designed for African businesses</p>
+        <section className="relative overflow-hidden py-20">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent" />
+          <div className="relative z-10 mx-auto max-w-7xl px-6">
+            <div className="mb-14 text-center">
+              <h2 className="mb-3 text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl">Everything you need to grow</h2>
+              <p className="mx-auto max-w-2xl text-slate-300">Built to help brands plan campaigns, manage spending, and turn attention into measurable growth.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-6 rounded-2xl hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/10 hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-orange-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="grid gap-6 md:grid-cols-3">
+              <div className="group relative rounded-2xl border border-slate-700/60 bg-slate-900/55 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-pink-500/40 hover:shadow-[0_18px_45px_rgba(236,72,153,0.15)]">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/5 to-orange-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                    <Smartphone className="w-8 h-8 text-pink-400" />
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500/20 to-orange-500/20 group-hover:rotate-3 group-hover:scale-110 transition-all duration-500">
+                    <Smartphone className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-pink-400 transition-colors">Mobile Money Payments</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Pay with MTN MoMo, Orange Money, and other local mobile money services. No international cards needed.</p>
+                  <h3 className="mb-2 text-lg font-semibold text-white transition-colors group-hover:text-pink-400">Mobile Money payments</h3>
+                  <p className="text-sm leading-relaxed text-slate-300">Pay with MTN MoMo, Orange Money, and local wallet options without friction.</p>
                 </div>
               </div>
 
-              <div className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-6 rounded-2xl hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="group relative rounded-2xl border border-slate-700/60 bg-slate-900/55 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-purple-500/40 hover:shadow-[0_18px_45px_rgba(168,85,247,0.15)]">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                    <Target className="w-8 h-8 text-purple-400" />
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 group-hover:rotate-3 group-hover:scale-110 transition-all duration-500">
+                    <Target className="h-8 w-8 text-purple-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-400 transition-colors">Smart Targeting</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">AI-powered targeting reaches your ideal audience across demographics, interests, and behaviors.</p>
+                  <h3 className="mb-2 text-lg font-semibold text-white transition-colors group-hover:text-purple-400">Smart targeting</h3>
+                  <p className="text-sm leading-relaxed text-slate-300">Reach better-fit audiences across interests, behaviors, and high-intent communities.</p>
                 </div>
               </div>
 
-              <div className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-6 rounded-2xl hover:border-orange-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="group relative rounded-2xl border border-slate-700/60 bg-slate-900/55 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-orange-500/40 hover:shadow-[0_18px_45px_rgba(249,115,22,0.15)]">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                    <BarChart3 className="w-8 h-8 text-orange-400" />
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500/20 to-pink-500/20 group-hover:rotate-3 group-hover:scale-110 transition-all duration-500">
+                    <BarChart3 className="h-8 w-8 text-orange-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">Real-Time Analytics</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Track performance across all platforms with unified dashboards and detailed reports.</p>
+                  <h3 className="mb-2 text-lg font-semibold text-white transition-colors group-hover:text-orange-400">Real-time analytics</h3>
+                  <p className="text-sm leading-relaxed text-slate-300">See performance and conversion trends clearly across platforms and channels.</p>
                 </div>
               </div>
 
