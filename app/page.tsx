@@ -23,6 +23,7 @@ import {
   Flame,
 } from "lucide-react";
 import TikTokIcon from "@/components/ui/TikTokIcon";
+import BrandLogo from "@/components/ui/BrandLogo";
 import LandingHeader from "@/components/ui/LandingHeader";
 import LandingFooter from "@/components/ui/LandingFooter";
 
@@ -91,12 +92,11 @@ export default function Home() {
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                   <span className="text-xs text-pink-400 font-medium">Now supporting TikTok Ads</span>
                 </div>
-                
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight animate-slide-up">
-                  Amplify Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-orange-400">Social Presence</span>.<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">Across Africa.</span>
-                </h1>
-                
+
+                <div className="mb-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+                  <BrandLogo showTagline />
+                </div>
+
                 <p className="text-base text-slate-400 max-w-xl leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
                   Launch viral campaigns on Facebook, Instagram, and TikTok with Mobile Money payments. 
                   Turn your content into engagement and sales.

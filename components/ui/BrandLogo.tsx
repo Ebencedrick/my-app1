@@ -8,36 +8,110 @@ export default function BrandLogo({
   compact = false,
 }: BrandLogoProps) {
   return (
-    <div className="flex items-center gap-3">
-      <div
-        className={
-          compact
-            ? "relative h-9 w-9 shrink-0"
-            : "relative h-12 w-12 shrink-0"
-        }
+    <div className="flex items-center gap-2 sm:gap-3">
+      <svg
+        viewBox="0 0 260 200"
+        className={compact ? "h-10 w-10 shrink-0" : "h-16 w-16 sm:h-20 sm:w-20 shrink-0"}
         aria-label="AdFlux brand mark"
+        role="img"
       >
-        <div className="absolute inset-0 rounded-[16px] bg-gradient-to-br from-cyan-400 via-blue-500 to-pink-500 opacity-90 shadow-[0_0_28px_rgba(34,211,238,0.6)]" />
-        <div className="absolute inset-[7px] rotate-[-18deg] rounded-[12px] bg-white/10 backdrop-blur-sm" />
-        <div className="absolute left-[15%] top-[18%] h-[54%] w-[46%] rotate-[-28deg] rounded-[18px] bg-gradient-to-br from-cyan-300 via-sky-400 to-blue-600 shadow-[0_0_18px_rgba(56,189,248,0.9)]" />
-        <div className="absolute right-[18%] top-[22%] h-[38%] w-[38%] rotate-[28deg] rounded-[18px] bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-500 shadow-[0_0_18px_rgba(236,72,153,0.9)]" />
-        <div className="absolute right-[17%] top-[22%] h-[15%] w-[45%] rotate-[-35deg] rounded-full bg-white/90" />
-      </div>
+        <defs>
+          <linearGradient id="adfluxRibbonA" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#31d9ff" />
+            <stop offset="32%" stopColor="#2fb8ff" />
+            <stop offset="100%" stopColor="#695dff" />
+          </linearGradient>
+          <linearGradient id="adfluxRibbonB" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#ff4fcf" />
+            <stop offset="45%" stopColor="#ef45ff" />
+            <stop offset="100%" stopColor="#7f4fff" />
+          </linearGradient>
+          <linearGradient id="adfluxRibbonC" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#eafcff" />
+            <stop offset="100%" stopColor="#dfe9ff" />
+          </linearGradient>
+        </defs>
+
+        <g transform="translate(0,8)">
+          <path
+            d="M18,120 C38,95 70,70 102,32 L136,32 C118,65 92,96 72,113 L44,113 L56,96 L92,96 L78,115 L44,115 L18,120 Z"
+            fill="url(#adfluxRibbonA)"
+            opacity="0.96"
+          />
+          <path
+            d="M62,123 L110,39 L138,39 L116,93 L176,93 L100,172 L62,123 Z"
+            fill="url(#adfluxRibbonA)"
+            opacity="0.96"
+          />
+          <path
+            d="M74,150 L130,123 L174,84 L188,96 L148,150 L74,150 Z"
+            fill="url(#adfluxRibbonB)"
+            opacity="0.96"
+          />
+          <path
+            d="M178,36 L202,42 L172,86 L146,78 L178,36 Z"
+            fill="url(#adfluxRibbonC)"
+            opacity="0.92"
+          />
+        </g>
+      </svg>
 
       <div className="flex flex-col leading-none">
-        <div
-          className={
-            compact
-              ? "text-lg font-black tracking-[-0.07em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-pink-300"
-              : "text-2xl sm:text-3xl font-black tracking-[-0.08em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-pink-300"
-          }
+        <svg
+          viewBox="0 0 720 110"
+          className={compact ? "h-7 w-auto" : "h-12 w-auto sm:h-16 lg:h-[5.3rem]"}
+          aria-label="AdFlux wordmark"
+          role="img"
         >
-          AdFlux
-        </div>
+          <defs>
+            <linearGradient id="adfluxWordGrad" x1="0%" x2="100%" y1="0%" y2="0%">
+              <stop offset="0%" stopColor="#2cdfef" />
+              <stop offset="48%" stopColor="#2bb9ff" />
+              <stop offset="100%" stopColor="#ff5fe1" />
+            </linearGradient>
+          </defs>
+
+          <text
+            x="0"
+            y="82"
+            fontSize="92"
+            fontWeight="900"
+            letterSpacing="-6"
+            fill="#f2f5ff"
+            fontFamily="Arial, Helvetica, sans-serif"
+          >
+            Ad
+          </text>
+          <text
+            x="183"
+            y="82"
+            fontSize="92"
+            fontWeight="900"
+            letterSpacing="-6"
+            fill="url(#adfluxWordGrad)"
+            fontFamily="Arial, Helvetica, sans-serif"
+          >
+            Flux
+          </text>
+        </svg>
+
         {showTagline && (
-          <div className="mt-1 text-[10px] font-medium tracking-[0.28em] text-slate-300 uppercase">
-            Turn Attention Into Growth
-          </div>
+          <svg viewBox="0 0 720 54" className="h-5 w-auto sm:h-7 lg:h-8">
+            <text
+              x="0"
+              y="35"
+              fontSize="30"
+              fontWeight="300"
+              letterSpacing="1.5"
+              fill="#e5ecff"
+              fontFamily="Arial, Helvetica, sans-serif"
+            >
+              <tspan>Turn</tspan>
+              <tspan dx="18" fill="#f8fbff">Attention</tspan>
+              <tspan dx="18">Into</tspan>
+              <tspan dx="18" fill="#ff8ef6">Growth.</tspan>
+            </text>
+          </svg>
         )}
       </div>
     </div>
