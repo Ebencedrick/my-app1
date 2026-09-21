@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { BarChart3, Wallet, Megaphone, FileText, Settings, LogOut, Flame, Eye, EyeOff, X, Loader2, Check, ShieldCheck } from "lucide-react";
-import BrandLogo from "@/components/ui/BrandLogo";
 import { getWalletBalance } from "@/lib/wallet";
 
 export default function DesktopPanel() {
@@ -115,7 +115,15 @@ export default function DesktopPanel() {
       <div className="flex h-full flex-col">
         <div className="mb-3">
           <Link href="/dashboard" className="flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
-            <BrandLogo compact />
+            <div className="relative h-8 w-24">
+              <Image
+                src="/adflux-logo.png"
+                alt="AdFlux logo"
+                fill
+                priority
+                className="object-contain object-left"
+              />
+            </div>
           </Link>
 
           {/* Compact Wallet & Actions Card - Email Removed */}

@@ -13,8 +13,8 @@ import {
   CheckCheck,
   ExternalLink
 } from "lucide-react";
+import Image from "next/image";
 import TikTokIcon from "@/components/ui/TikTokIcon";
-import BrandLogo from "@/components/ui/BrandLogo";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
@@ -189,7 +189,15 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-16 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-3 group">
-            <BrandLogo compact />
+            <div className="relative h-9 w-28 sm:h-10 sm:w-32">
+              <Image
+                src="/adflux-logo.png"
+                alt="AdFlux logo"
+                fill
+                priority
+                className="object-contain object-left"
+              />
+            </div>
           </Link>
 
           <div className="flex items-center gap-3">

@@ -22,8 +22,8 @@ import {
   ThumbsUp,
   Flame,
 } from "lucide-react";
+import Image from "next/image";
 import TikTokIcon from "@/components/ui/TikTokIcon";
-import BrandLogo from "@/components/ui/BrandLogo";
 import LandingHeader from "@/components/ui/LandingHeader";
 import LandingFooter from "@/components/ui/LandingFooter";
 
@@ -94,7 +94,15 @@ export default function Home() {
                 </div>
 
                 <div className="mb-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
-                  <BrandLogo showTagline />
+                  <div className="relative w-full max-w-[760px] h-[160px] md:h-[200px]">
+                    <Image
+                      src="/adflux-logo.png"
+                      alt="AdFlux logo"
+                      fill
+                      priority
+                      className="object-contain object-left"
+                    />
+                  </div>
                 </div>
 
                 <p className="text-base text-slate-400 max-w-xl leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
@@ -126,101 +134,119 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Hero Visual - Phone with Social Media Engagement (hidden on small screens) */}
-              <div className="relative animate-fade-in hidden md:block" style={{ animationDelay: '0.3s' }}>
-                <div className="relative">
-                  {/* Phone Frame */}
-                  <div className="relative mx-auto w-72 h-[500px] bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] border-4 border-slate-700 shadow-2xl shadow-pink-500/20">
-                    {/* Phone Notch */}
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl"></div>
-                    
-                    {/* Phone Screen */}
-                    <div className="absolute inset-4 bg-gradient-to-br from-purple-900 to-pink-900 rounded-[2rem] overflow-hidden">
-                      {/* Social Media Content */}
-                      <div className="p-4 space-y-4">
-                        {/* Header */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full"></div>
-                            <div>
-                              <div className="text-white text-xs font-semibold">YourBrand</div>
-                              <div className="text-pink-300 text-xs">@yourbrand</div>
-                            </div>
-                          </div>
-                          <Heart className="w-5 h-5 text-pink-500 fill-pink-500" />
-                        </div>
-
-                        {/* Post Content */}
-                        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-xl p-3">
-                          <div className="text-white text-sm mb-2">🔥 Flash Sale! 50% OFF everything!</div>
-                          <div className="text-slate-300 text-xs">Limited time offer. Don't miss out!</div>
-                        </div>
-
-                        {/* Engagement Stats */}
-                        <div className="flex justify-around bg-slate-800/30 rounded-xl p-3">
-                          <div className="text-center">
-                            <div className="text-white text-lg font-bold">12.4K</div>
-                            <div className="text-pink-300 text-xs">Likes</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-white text-lg font-bold">3.2K</div>
-                            <div className="text-purple-300 text-xs">Comments</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-white text-lg font-bold">8.9K</div>
-                            <div className="text-orange-300 text-xs">Shares</div>
-                          </div>
-                        </div>
-
-                        {/* Floating Engagement Icons */}
-                        <div className="relative h-32">
-                          <div className="absolute top-2 left-4 animate-float" style={{ animationDelay: '0s' }}>
-                            <div className="bg-pink-500/20 backdrop-blur-sm rounded-full p-2">
-                              <Heart className="w-6 h-6 text-pink-500 fill-pink-500" />
-                            </div>
-                          </div>
-                          <div className="absolute top-8 right-8 animate-float" style={{ animationDelay: '0.5s' }}>
-                            <div className="bg-purple-500/20 backdrop-blur-sm rounded-full p-2">
-                              <ThumbsUp className="w-6 h-6 text-purple-500" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-4 left-8 animate-float" style={{ animationDelay: '1s' }}>
-                            <div className="bg-orange-500/20 backdrop-blur-sm rounded-full p-2">
-                              <MessageCircle className="w-6 h-6 text-orange-500" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-8 right-4 animate-float" style={{ animationDelay: '1.5s' }}>
-                            <div className="bg-pink-500/20 backdrop-blur-sm rounded-full p-2">
-                              <Share2 className="w-6 h-6 text-pink-500" />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Performance Indicator */}
-                        <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-3">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-400" />
-                            <div className="text-white text-xs font-semibold">+234% Engagement</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Floating Social Icons Around Phone */}
-                  <div className="absolute -left-8 top-20 animate-float" style={{ animationDelay: '0.3s' }}>
+              {/* Hero Visual - Realistic phone mockup visible on both desktop and mobile */}
+              <div className="relative animate-fade-in my-8 md:my-0" style={{ animationDelay: '0.3s' }}>
+                <div className="relative mx-auto w-[290px] sm:w-[330px] md:w-[360px] lg:w-[390px]">
+                  <div className="absolute -left-8 top-20 hidden sm:block animate-float" style={{ animationDelay: '0.3s' }}>
                     <div className="bg-blue-500/20 backdrop-blur-sm rounded-full p-3 border border-blue-500/30">
                       <Facebook className="w-6 h-6 text-blue-500" />
                     </div>
                   </div>
-                  <div className="absolute -right-8 top-32 animate-float" style={{ animationDelay: '0.6s' }}>
+                  <div className="absolute -right-8 top-28 hidden sm:block animate-float" style={{ animationDelay: '0.6s' }}>
                     <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-full p-3 border border-pink-500/30">
                       <Instagram className="w-6 h-6 text-pink-500" />
                     </div>
                   </div>
-                  <div className="absolute -left-4 bottom-32 animate-float" style={{ animationDelay: '0.9s' }}>
+                  <div className="absolute -left-4 bottom-24 hidden sm:block animate-float" style={{ animationDelay: '0.9s' }}>
                     <div className="bg-black/30 backdrop-blur-sm rounded-full p-3 border border-white/20">
                       <TikTokIcon className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="relative mx-auto w-full h-[520px] bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-[2.5rem] border-[3px] border-slate-700 shadow-[0_30px_80px_rgba(236,72,153,0.25)]">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-slate-950 rounded-b-2xl border border-slate-800/80"></div>
+
+                    <div className="absolute inset-4 rounded-[2rem] overflow-hidden bg-gradient-to-br from-[#1a0d35] via-[#120e41] to-[#0b1736]">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(236,72,153,0.22),transparent_34%)]" />
+
+                      <div className="relative p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-cyan-500/30">A</div>
+                            <div>
+                              <div className="text-white text-[11px] font-semibold">AdFlux Studio</div>
+                              <div className="text-cyan-300 text-[10px]">@adflux</div>
+                            </div>
+                          </div>
+                          <div className="rounded-full bg-pink-500/15 p-2">
+                            <Heart className="w-4 h-4 text-pink-400 fill-pink-400" />
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-cyan-400/20 bg-slate-900/50 p-3 shadow-inner shadow-cyan-500/10">
+                          <div className="flex items-center justify-between text-[10px] text-cyan-200 mb-2">
+                            <span>Campaign live</span>
+                            <span className="rounded-full bg-green-500/15 px-1.5 py-0.5 text-green-300">Live</span>
+                          </div>
+                          <div className="text-white text-sm font-semibold leading-snug">Launch your next viral brand push for 4x more attention.</div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-2 text-center">
+                            <div className="text-white text-base font-bold">18.6K</div>
+                            <div className="text-cyan-300 text-[9px] uppercase tracking-wide">Reach</div>
+                          </div>
+                          <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-2 text-center">
+                            <div className="text-white text-base font-bold">2.4%</div>
+                            <div className="text-pink-300 text-[9px] uppercase tracking-wide">CTR</div>
+                          </div>
+                          <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-2 text-center">
+                            <div className="text-white text-base font-bold">3.8x</div>
+                            <div className="text-violet-300 text-[9px] uppercase tracking-wide">ROAS</div>
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-700 bg-slate-900/40 p-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Audience</div>
+                            <div className="text-[10px] text-emerald-300">+28% this week</div>
+                          </div>
+                          <div className="space-y-2">
+                            <div>
+                              <div className="flex justify-between text-[10px] text-slate-300 mb-1">
+                                <span>18-34</span>
+                                <span>74%</span>
+                              </div>
+                              <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full w-[74%] bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 rounded-full" />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex justify-between text-[10px] text-slate-300 mb-1">
+                                <span>Interest match</span>
+                                <span>89%</span>
+                              </div>
+                              <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full w-[89%] bg-gradient-to-r from-pink-400 via-fuchsia-500 to-violet-500 rounded-full" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/12 to-cyan-500/12 p-3">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-emerald-400" />
+                            <span className="text-white text-xs font-semibold">Attention score up 234%</span>
+                          </div>
+                        </div>
+
+                        <div className="relative h-24 rounded-2xl border border-slate-700 bg-slate-900/50 p-3">
+                          <div className="absolute inset-x-3 bottom-3 flex items-end gap-2 h-14">
+                            {[38, 52, 44, 68, 78, 92, 88].map((height, idx) => (
+                              <div
+                                key={idx}
+                                className="flex-1 rounded-t-md bg-gradient-to-t from-cyan-500 via-blue-500 to-pink-500"
+                                style={{ height: `${height}%` }}
+                              />
+                            ))}
+                          </div>
+                          <div className="absolute top-3 right-3 flex gap-2">
+                            <div className="bg-pink-500/20 p-1.5 rounded-full"><Heart className="w-3 h-3 text-pink-400 fill-pink-400" /></div>
+                            <div className="bg-purple-500/20 p-1.5 rounded-full"><ThumbsUp className="w-3 h-3 text-purple-300" /></div>
+                            <div className="bg-orange-500/20 p-1.5 rounded-full"><MessageCircle className="w-3 h-3 text-orange-300" /></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

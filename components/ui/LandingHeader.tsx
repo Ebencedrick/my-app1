@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
-import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,7 +36,15 @@ export default function LandingHeader() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-3">
-              <BrandLogo compact />
+              <div className="relative h-10 w-44 sm:h-12 sm:w-52 lg:h-14 lg:w-64">
+                <Image
+                  src="/adflux-logo.png"
+                  alt="AdFlux logo"
+                  fill
+                  priority
+                  className="object-contain object-left"
+                />
+              </div>
             </Link>
 
             <div className="hidden lg:flex items-center gap-6 ml-6">
