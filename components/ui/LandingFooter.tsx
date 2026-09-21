@@ -1,32 +1,55 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 export default function LandingFooter() {
   return (
-    <footer className="border-t border-[var(--border)] bg-transparent/10">
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-orange-400 to-amber-500 shadow-sm">
-              <span className="text-sm font-semibold text-white">AP</span>
+    <footer className="border-t border-[var(--border)] bg-[rgba(15,23,42,0.18)] backdrop-blur-sm">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr]">
+          <div className="space-y-4">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <div className="relative h-10 w-36">
+                <Image
+                  src="/adflux-logo-transparent.png"
+                  alt="AdFlux logo"
+                  fill
+                  priority
+                  className="object-contain object-left"
+                  unoptimized
+                />
+              </div>
+            </Link>
+            <p className="max-w-sm text-sm leading-6 text-[var(--muted)]">
+              Turn attention into growth with smarter ad planning, local payments, and campaign reporting built for modern businesses.
+            </p>
+          </div>
+
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--subtle)]">Company</p>
+            <div className="space-y-3 text-sm">
+              <Link href="/about" className="block text-[var(--muted)] transition-colors hover:text-[var(--text)]">About</Link>
+              <Link href="/pricing" className="block text-[var(--muted)] transition-colors hover:text-[var(--text)]">Pricing</Link>
+              <Link href="/contact" className="block text-[var(--muted)] transition-colors hover:text-[var(--text)]">Support</Link>
             </div>
-            <div className="text-sm text-[var(--text)]">AdPlatform</div>
-            <div className="ml-3 hidden text-xs text-[var(--subtle)] sm:block">Ads + Mobile Money</div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
-            <Link href="/pricing" className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent hover:opacity-90">Pricing</Link>
-            <span className="text-[var(--subtle)]">•</span>
-            <Link href="/about" className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent hover:opacity-90">About</Link>
-            <span className="text-[var(--subtle)]">•</span>
-            <Link href="/contact" className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent hover:opacity-90">Support</Link>
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--subtle)]">Legal</p>
+            <div className="space-y-3 text-sm">
+              <Link href="/terms" className="block text-[var(--muted)] transition-colors hover:text-[var(--text)]">Terms</Link>
+              <Link href="/privacy" className="block text-[var(--muted)] transition-colors hover:text-[var(--text)]">Privacy</Link>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-[var(--subtle)]">
-            <Link href="/terms" className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent hover:opacity-90">Terms</Link>
-            <Link href="/privacy" className="bg-gradient-to-r from-orange-300 to-amber-300 bg-clip-text text-transparent hover:opacity-90">Privacy</Link>
-            <div className="hidden sm:block">© 2024 AdPlatform</div>
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--subtle)]">Reach us</p>
+            <div className="space-y-3 text-sm text-[var(--muted)]">
+              <p>support@adflux.example</p>
+              <p>+237 6xx xxx xxx</p>
+              <p>© 2024 AdFlux</p>
+            </div>
           </div>
         </div>
       </div>

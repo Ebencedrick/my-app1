@@ -51,6 +51,12 @@ export default function LandingHeader() {
   const buttonClasses = isDarkMode
     ? "bg-slate-900/80 text-slate-100 border border-slate-700/70 hover:border-slate-500"
     : "bg-white text-slate-900 border border-slate-200 hover:border-slate-300";
+  const mobileSignInClasses = isDarkMode
+    ? "bg-white/5 text-slate-100 ring-white/10"
+    : "bg-slate-100 text-slate-900 ring-slate-200";
+  const mobileMenuClasses = isDarkMode
+    ? "border-slate-700/50 bg-slate-950/95"
+    : "border-slate-200/80 bg-white/95";
 
   return (
     <nav
@@ -64,7 +70,7 @@ export default function LandingHeader() {
             <Link href="/" className="flex items-center gap-3">
               <div className="relative h-10 w-40 sm:h-12 sm:w-52 lg:h-14 lg:w-64">
                 <Image
-                  src="/adflux-logo.png"
+                  src="/adflux-logo-transparent.png"
                   alt="AdFlux logo"
                   fill
                   priority
@@ -102,14 +108,14 @@ export default function LandingHeader() {
             </div>
 
             <div className="flex items-center gap-2 md:hidden">
-              <Link href="/login" className="inline-flex items-center rounded-lg bg-white/5 px-2.5 py-2 text-xs font-medium text-slate-100 ring-1 ring-white/10">
+              <Link href="/login" className={`inline-flex items-center rounded-lg px-2.5 py-2 text-xs font-medium ring-1 transition-colors ${mobileSignInClasses}`}>
                 Sign in
               </Link>
               <button
                 type="button"
                 aria-expanded={isMenuOpen}
                 aria-controls="mobile-menu"
-                className="p-2 rounded-md border border-slate-700/60 bg-slate-900/60 text-white relative z-[9999]"
+                className={`p-2 rounded-md border relative z-[9999] ${isDarkMode ? "border-slate-700/60 bg-slate-900/60 text-white" : "border-slate-200 bg-white text-slate-900"}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMenuOpen((s) => !s);
@@ -122,13 +128,13 @@ export default function LandingHeader() {
         </div>
 
         {isMenuOpen && (
-          <div id="mobile-menu" className="md:hidden absolute left-0 right-0 top-full z-60 border-b border-slate-700/50 bg-slate-950/95 backdrop-blur-xl">
+          <div id="mobile-menu" className={`md:hidden absolute left-0 right-0 top-full z-60 border-b backdrop-blur-xl ${mobileMenuClasses}`}>
             <div className="max-w-7xl mx-auto px-4 py-4">
               <div className="space-y-3">
-                <Link href="#features" ref={firstLinkRef} className="block text-sm text-slate-200 hover:text-white transition-colors">Features</Link>
-                <Link href="/pricing" className="block text-sm text-slate-200 hover:text-white transition-colors">Pricing</Link>
-                <Link href="/about" className="block text-sm text-slate-200 hover:text-white transition-colors">About</Link>
-                <Link href="/contact" className="block text-sm text-slate-200 hover:text-white transition-colors">Contact</Link>
+                <Link href="#features" ref={firstLinkRef} className={`block text-sm transition-colors ${isDarkMode ? "text-slate-200 hover:text-white" : "text-slate-700 hover:text-slate-950"}`}>Features</Link>
+                <Link href="/pricing" className={`block text-sm transition-colors ${isDarkMode ? "text-slate-200 hover:text-white" : "text-slate-700 hover:text-slate-950"}`}>Pricing</Link>
+                <Link href="/about" className={`block text-sm transition-colors ${isDarkMode ? "text-slate-200 hover:text-white" : "text-slate-700 hover:text-slate-950"}`}>About</Link>
+                <Link href="/contact" className={`block text-sm transition-colors ${isDarkMode ? "text-slate-200 hover:text-white" : "text-slate-700 hover:text-slate-950"}`}>Contact</Link>
                 <Link href="/signup" className="block w-full text-center rounded-lg bg-gradient-to-r from-orange-400 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white">
                   Get Started
                 </Link>

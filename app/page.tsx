@@ -294,6 +294,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent" />
           <div className="relative z-10 mx-auto max-w-7xl px-6">
             <div className="mb-14 text-center">
+              <span className="mb-4 inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-cyan-200">Built for performance</span>
               <h2 className="mb-3 text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl">Everything you need to grow</h2>
               <p className="mx-auto max-w-2xl text-slate-300">Built to help brands plan campaigns, manage spending, and turn attention into measurable growth.</p>
             </div>
@@ -369,47 +370,48 @@ export default function Home() {
         </section>
 
         {/* Growth section */}
-        <section className="py-20 bg-gradient-to-b from-transparent to-slate-900/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-orange-500/5"></div>
-          <div className="max-w-5xl mx-auto px-6 relative z-10">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Built for faster campaign growth</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">From idea to launch, your team gets the tools to plan, fund, and scale social campaigns with less friction and more momentum.</p>
+        <section className="relative overflow-hidden bg-gradient-to-b from-transparent to-slate-900/50 py-20">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-orange-500/5" />
+          <div className="relative z-10 mx-auto max-w-5xl px-6">
+            <div className="mb-12 text-center">
+              <span className="mb-4 inline-flex items-center rounded-full border border-pink-500/20 bg-pink-500/10 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-pink-200">Campaign acceleration</span>
+              <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">Built for faster campaign growth</h2>
+              <p className="mx-auto max-w-2xl text-slate-400">From idea to launch, your team gets the tools to plan, fund, and scale social campaigns with less friction and more momentum.</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="group relative bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/10 hover:-translate-y-2">
+            <div className="grid items-center gap-8 md:grid-cols-2">
+              <div className="group relative rounded-3xl border border-slate-700/70 bg-slate-900/55 p-8 transition-all duration-500 hover:-translate-y-1 hover:border-pink-500/50 hover:shadow-[0_25px_55px_rgba(244,114,182,0.12)]">
                 <div className="mb-6">
-                  <p className="text-sm uppercase tracking-[0.18em] text-pink-300 mb-2">Why teams choose us</p>
-                  <div className="text-5xl font-bold text-white mb-2">Faster</div>
+                  <p className="mb-2 text-sm uppercase tracking-[0.18em] text-pink-300">Why teams choose us</p>
+                  <div className="mb-2 text-5xl font-bold text-white">Faster</div>
                   <div className="text-sm text-slate-400">campaign execution</div>
                 </div>
-                <ul className="space-y-3 mb-8">
+                <ul className="mb-8 space-y-3">
                   <li className="flex items-start gap-2 text-sm text-slate-300">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                     Launch campaigns without extra setup friction
                   </li>
                   <li className="flex items-start gap-2 text-sm text-slate-300">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                     Manage targeting and budget from one place
                   </li>
                   <li className="flex items-start gap-2 text-sm text-slate-300">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                     Keep momentum with streamlined campaign workflows
                   </li>
                 </ul>
-                <Link href="/signup" className="block w-full py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-pink-400 hover:to-orange-400 transition-all text-center shadow-lg shadow-pink-500/25">
+                <Link href="/signup" className="block w-full rounded-xl bg-gradient-to-r from-pink-500 to-orange-500 py-3 text-center text-sm font-medium text-white shadow-lg shadow-pink-500/25 transition-all hover:brightness-110">
                   Get Started
                 </Link>
               </div>
 
-              <div className="group relative bg-gradient-to-br from-pink-600/20 to-orange-600/20 border-2 border-pink-500/50 rounded-2xl p-8 shadow-2xl shadow-pink-500/10 transition-all duration-500 hover:-translate-y-2">
+              <div className="group relative rounded-3xl border border-pink-500/40 bg-gradient-to-br from-pink-600/20 to-orange-600/20 p-8 shadow-[0_25px_55px_rgba(244,114,182,0.14)] transition-all duration-500 hover:-translate-y-1">
                 <div className="mb-6">
-                  <p className="text-sm uppercase tracking-[0.18em] text-pink-300 mb-2">Campaign outcomes</p>
-                  <div className="text-4xl font-bold text-white mb-2">+234%</div>
-                  <div className="text-sm text-slate-400">engagement uplift</div>
+                  <p className="mb-2 text-sm uppercase tracking-[0.18em] text-pink-300">Campaign outcomes</p>
+                  <div className="mb-2 text-4xl font-bold text-white">+234%</div>
+                  <div className="text-sm text-slate-300">engagement uplift</div>
                 </div>
-                <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-300">
+                <div className="rounded-2xl border border-slate-700/70 bg-slate-900/60 p-4 text-sm leading-6 text-slate-300">
                   Better targeting, faster launch cycles, and clearer campaign reporting for growth-focused teams.
                 </div>
               </div>
@@ -418,32 +420,31 @@ export default function Home() {
         </section>
 
         {/* How It Works */}
-        <section className="py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent"></div>
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-white mb-4">How It Works</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">Get started in 4 simple steps</p>
+        <section className="relative overflow-hidden py-20">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
+          <div className="relative z-10 mx-auto max-w-7xl px-6">
+            <div className="mb-16 text-center">
+              <span className="mb-4 inline-flex items-center rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-violet-200">Simple flow</span>
+              <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">How it works</h2>
+              <p className="mx-auto max-w-2xl text-slate-400">Get started in four clear steps and move from strategy to live campaign faster.</p>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid gap-6 md:grid-cols-4">
               {[
-                { step: 1, title: "Sign Up", desc: "Create your account in seconds", icon: <Sparkles className="w-6 h-6" /> },
-                { step: 2, title: "Add Funds", desc: "Deposit via Mobile Money or crypto", icon: <Smartphone className="w-6 h-6" /> },
-                { step: 3, title: "Create Campaign", desc: "Set your budget and targeting", icon: <Target className="w-6 h-6" /> },
-                { step: 4, title: "Go Live", desc: "We launch and manage your ads", icon: <Flame className="w-6 h-6" /> }
+                { step: 1, title: "Sign up", desc: "Create your account in minutes", icon: <Sparkles className="h-6 w-6" /> },
+                { step: 2, title: "Add funds", desc: "Deposit through Mobile Money or crypto", icon: <Smartphone className="h-6 w-6" /> },
+                { step: 3, title: "Create campaign", desc: "Set budget, audience, and creative direction", icon: <Target className="h-6 w-6" /> },
+                { step: 4, title: "Go live", desc: "Launch and grow with real-time reporting", icon: <Flame className="h-6 w-6" /> }
               ].map((item, index) => (
-                <div key={index} className="text-center group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-orange-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div key={index} className="group relative overflow-hidden rounded-3xl border border-slate-700/70 bg-slate-900/55 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-[0_20px_50px_rgba(14,165,233,0.12)]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-pink-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   <div className="relative">
-                    <div className="w-20 h-20 bg-gradient-to-br from-pink-500 to-orange-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg shadow-pink-500/25 group-hover:shadow-pink-500/40">
-                      {item.step}
+                    <div className="mb-5 flex items-center justify-between">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-orange-500 text-xl font-bold text-white shadow-lg shadow-pink-500/25">{item.step}</div>
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20">{item.icon}</div>
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-100">
-                      {item.icon}
-                    </div>
-                    <h4 className="font-semibold text-white mb-2 group-hover:text-pink-400 transition-colors">{item.title}</h4>
-                    <p className="text-sm text-slate-400 group-hover:translate-y-1 transition-transform duration-300">{item.desc}</p>
+                    <h4 className="mb-2 text-xl font-semibold text-white">{item.title}</h4>
+                    <p className="text-sm leading-6 text-slate-400">{item.desc}</p>
                   </div>
                 </div>
               ))}
