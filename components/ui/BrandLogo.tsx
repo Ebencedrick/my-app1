@@ -76,18 +76,18 @@ export default function BrandLogo({
             y="82"
             fontSize="92"
             fontWeight="900"
-            letterSpacing="-6"
+            letterSpacing="-9"
             fill="#f2f5ff"
             fontFamily="Arial, Helvetica, sans-serif"
           >
             Ad
           </text>
           <text
-            x="183"
+            x="172"
             y="82"
             fontSize="92"
             fontWeight="900"
-            letterSpacing="-6"
+            letterSpacing="-9"
             fill="url(#adfluxWordGrad)"
             fontFamily="Arial, Helvetica, sans-serif"
           >
@@ -102,14 +102,14 @@ export default function BrandLogo({
               y="35"
               fontSize="30"
               fontWeight="300"
-              letterSpacing="1.5"
+              letterSpacing="0"
               fill="#e5ecff"
               fontFamily="Arial, Helvetica, sans-serif"
             >
               <tspan>Turn</tspan>
-              <tspan dx="18" fill="#f8fbff">Attention</tspan>
-              <tspan dx="18">Into</tspan>
-              <tspan dx="18" fill="#ff8ef6">Growth.</tspan>
+              <tspan dx="12" fill="#f8fbff">Attention</tspan>
+              <tspan dx="12">Into</tspan>
+              <tspan dx="12" fill="#ff8ef6">Growth.</tspan>
             </text>
           </svg>
         )}
