@@ -14,11 +14,18 @@ export default function AdminLoginPage() {
 
     if (!email || !password) return;
 
+    const adminEmail = email.trim().toLowerCase();
+    const adminUser = {
+      email: adminEmail,
+      role: "admin",
+      onboardingComplete: true,
+      loginTime: new Date().toISOString(),
+    };
+
     localStorage.setItem("mock_admin", "true");
-    localStorage.setItem(
-      "mock_session",
-      JSON.stringify({ email, role: "admin", loginTime: new Date().toISOString() })
-    );
+    localStorage.setItem("mock_session", adminEmail);
+    localStorage.setItem("mock_user", JSON.stringify(adminUser));
+    localStorage.setItem("mock_onboarding", "true");
 
     router.push("/admin");
   };

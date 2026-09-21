@@ -58,10 +58,7 @@ export default function AuthGuard({
       } catch {}
 
       let onboardingComplete = parsedUser?.onboardingComplete || safeGetItem("mock_onboarding") === "true";
-      let isAdmin =
-        parsedUser?.role === "admin" ||
-        safeGetItem("mock_admin") === "true" ||
-        Boolean(session);
+      let isAdmin = parsedUser?.role === "admin" || safeGetItem("mock_admin") === "true";
 
       // 1. If fast local check immediately satisfies criteria, allow render
       if (guard === "APP" && session && onboardingComplete) {

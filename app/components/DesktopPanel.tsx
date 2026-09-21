@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BarChart3, Wallet, Megaphone, FileText, Settings, LogOut, Flame, Eye, EyeOff, X, Loader2, Check, ShieldCheck } from "lucide-react";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { getWalletBalance } from "@/lib/wallet";
 
 export default function DesktopPanel() {
@@ -114,13 +115,7 @@ export default function DesktopPanel() {
       <div className="flex h-full flex-col">
         <div className="mb-3">
           <Link href="/dashboard" className="flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-orange-500 shadow-md shadow-pink-500/25">
-              <Flame className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-pink-300 font-semibold">Account</p>
-              <h2 className="text-base font-bold text-white leading-tight">AdPlatform</h2>
-            </div>
+            <BrandLogo compact />
           </Link>
 
           {/* Compact Wallet & Actions Card - Email Removed */}

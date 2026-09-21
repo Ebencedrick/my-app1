@@ -14,6 +14,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import TikTokIcon from "@/components/ui/TikTokIcon";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
@@ -188,13 +189,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-16 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-pink-500 to-orange-500 shadow-md shadow-pink-500/20 group-hover:scale-105 transition-transform">
-              <TikTokIcon className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white leading-none tracking-tight">AdPlatform</span>
-              <span className="text-[11px] text-slate-400 -mt-0.5 font-normal">Cross-network ad manager</span>
-            </div>
+            <BrandLogo compact />
           </Link>
 
           <div className="flex items-center gap-3">

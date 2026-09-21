@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Flame, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,13 +36,7 @@ export default function LandingHeader() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl flex items-center justify-center shadow-md">
-                <Flame className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-white leading-tight">AdPlatform</div>
-                <div className="text-xs text-amber-200 -mt-0.5">Ads + Mobile Money</div>
-              </div>
+              <BrandLogo compact />
             </Link>
 
             <div className="hidden lg:flex items-center gap-6 ml-6">
